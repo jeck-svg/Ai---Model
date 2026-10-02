@@ -1,6 +1,8 @@
+import { MatchingSearchForm } from "./MatchingSearchForm";
+
 export function SearchBar({ defaultValue = "" }: { defaultValue?: string }) {
   return (
-    <form action="/search" className="flex w-full border border-neutral-900" role="search">
+    <MatchingSearchForm className="flex w-full border border-neutral-900">
       <span aria-hidden className="flex items-center pl-4 text-xs tracking-wide text-neutral-400 uppercase">
         Query_
       </span>
@@ -17,6 +19,6 @@ export function SearchBar({ defaultValue = "" }: { defaultValue?: string }) {
       >
         Cerca ↗
       </button>
-    </form>
+    </MatchingSearchForm>
   );
 }

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getModel, modelCode, MODELS, type Model } from "@/lib/models";
+import { MatchingSearchForm } from "./MatchingSearchForm";
 import { NavPill } from "./NavPill";
 
 const ArrowIcon = () => (
@@ -136,7 +137,7 @@ export function Hero() {
         <div className="relative mt-8 w-full rounded-full bg-neutral-800 p-[2px] shadow-2xl shadow-neutral-900/25">
           <span aria-hidden className="led-ring absolute inset-0 rounded-full" />
           <span aria-hidden className="led-ring absolute -inset-1 rounded-full opacity-60 blur-md" />
-          <form action="/search" role="search" className="relative flex h-16 items-center rounded-full bg-neutral-950 p-2 pl-7 sm:h-[72px]">
+          <MatchingSearchForm className="relative flex h-16 items-center rounded-full bg-neutral-950 p-2 pl-7 sm:h-[72px]">
             <span aria-hidden className="mr-3 text-xs tracking-wide text-white/50 uppercase">
               Query_
             </span>
@@ -153,7 +154,7 @@ export function Hero() {
               Cerca
               <ArrowIcon />
             </button>
-          </form>
+          </MatchingSearchForm>
         </div>
       </div>
 
