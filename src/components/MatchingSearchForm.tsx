@@ -2,8 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { createPortal } from "react-dom";
+import { createContext, useContext, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { euro, minPrice, modelCode, MODELS, searchModels, type Model } from "@/lib/models";
 
 const DURATION = 4000; // ms of "matching"
@@ -35,47 +34,63 @@ function bestMatch(q: string): Model | null {
   return found.reduce((a, b) => (score(b.id, q, true) > score(a.id, q, true) ? b : a));
 }
 
-const targetFor = (q: string, best: Model | null) =>
-  best ? `/models/${best.id}` : q ? `/search?q=${encodeURIComponent(q)}` : "/search";
+const resultsUrl = (q: string) => (q ? `/search?q=${encodeURIComponent(q)}` : "/search");
 
-// Search form that plays a short matching animation, then a short read-out of the best
-// match and opens its page (or the results page when there is no single best match).
-export function MatchingSearchForm({ className, children }: { className?: string; children: ReactNode }) {
+type StartMatching = (q: string) => void;
+const MatchingContext = createContext<StartMatching | null>(null);
+
+// Lives in the root layout so the overlay survives the navigation to /search and can
+// cross-fade into the results page. Plays the matching animation, then a read-out of
+// the best match, then opens the results.
+export function MatchingProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [query, setQuery] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
+  const [leaving, setLeaving] = useState(false);
   const raf = useRef(0);
+  const going = useRef(false);
 
   const go = (q: string) => {
-    router.push(targetFor(q, bestMatch(q)));
-    // The overlay stays up while the next page loads, then goes away.
-    setTimeout(() => setQuery(null), 400);
+    if (going.current) return;
+    going.current = true;
+    cancelAnimationFrame(raf.current);
+    const url = resultsUrl(q);
+    router.push(url);
+    // Keep the overlay up until the results page is in place, then fade it out.
+    const startedAt = performance.now();
+    const waitForPage = () => {
+      const arrived = location.pathname + location.search === url;
+      if (!arrived && performance.now() - startedAt < 3000) return void setTimeout(waitForPage, 50);
+      setLeaving(true);
+      setTimeout(() => {
+        setQuery(null);
+        setLeaving(false);
+        going.current = false;
+      }, 700);
+    };
+    waitForPage();
   };
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const q = String(new FormData(e.currentTarget).get("q") ?? "").trim();
-    router.prefetch(targetFor(q, bestMatch(q)));
+  const start: StartMatching = (q) => {
+    if (query !== null) return;
+    router.prefetch(resultsUrl(q));
     setElapsed(0);
     setQuery(q);
   };
 
   useEffect(() => {
     if (query === null) return;
-    const start = performance.now();
+    const begin = performance.now();
     const total = bestMatch(query) ? DURATION + READOUT : DURATION;
     const tick = (now: number) => {
-      const t = now - start;
+      const t = now - begin;
       setElapsed(Math.min(t, total));
       if (t < total) raf.current = requestAnimationFrame(tick);
       else go(query);
     };
     raf.current = requestAnimationFrame(tick);
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        cancelAnimationFrame(raf.current);
-        go(query);
-      }
+      if (e.key === "Escape") go(query);
     };
     window.addEventListener("keydown", onKey);
     const overflow = document.body.style.overflow;
@@ -89,12 +104,30 @@ export function MatchingSearchForm({ className, children }: { className?: string
   }, [query]);
 
   return (
-    <>
-      <form action="/search" role="search" onSubmit={onSubmit} className={className}>
-        {children}
-      </form>
-      {query !== null && createPortal(<MatchingOverlay query={query} elapsed={elapsed} onSkip={() => go(query)} />, document.body)}
-    </>
+    <MatchingContext.Provider value={start}>
+      {children}
+      {query !== null && (
+        <div className={`transition-opacity duration-700 ease-out ${leaving ? "pointer-events-none opacity-0" : "opacity-100"}`}>
+          <MatchingOverlay query={query} elapsed={elapsed} onSkip={() => go(query)} />
+        </div>
+      )}
+    </MatchingContext.Provider>
+  );
+}
+
+// Search form that hands the query to the matching animation instead of navigating
+// directly (falls back to a normal GET to /search without JavaScript).
+export function MatchingSearchForm({ className, children }: { className?: string; children: ReactNode }) {
+  const start = useContext(MatchingContext);
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    if (!start) return;
+    e.preventDefault();
+    start(String(new FormData(e.currentTarget).get("q") ?? "").trim());
+  };
+  return (
+    <form action="/search" role="search" onSubmit={onSubmit} className={className}>
+      {children}
+    </form>
   );
 }
 
@@ -196,8 +229,8 @@ function MatchingOverlay({ query, elapsed, onSkip }: { query: string; elapsed: n
   );
 }
 
-// Two-second focus on the selected model: photo in a polaroid frame, data rows appearing
-// one after the other, then the profile opens.
+// Two-second focus on the selected model: photo in a polaroid frame and data rows appearing
+// one after the other, before the results page fades in.
 function Readout({ model, query, t, onSkip }: { model: Model; query: string; t: number; onSkip: () => void }) {
   const rows: [string, string][] = [
     ["Codice", modelCode(model)],
@@ -217,7 +250,7 @@ function Readout({ model, query, t, onSkip }: { model: Model; query: string; t: 
         <span className="font-medium">Matching_Engine.v1</span>
         <span className="hidden truncate text-neutral-500 sm:inline">Query: &ldquo;{query}&rdquo;</span>
         <button type="button" onClick={onSkip} className="link-u">
-          Apri ora ↗
+          Vai ai risultati ↗
         </button>
       </div>
 
@@ -253,7 +286,7 @@ function Readout({ model, query, t, onSkip }: { model: Model; query: string; t: 
               );
             })}
           </dl>
-          <p className="mt-6 text-xs tracking-wide text-neutral-500 uppercase">Apertura profilo…</p>
+          <p className="mt-6 text-xs tracking-wide text-neutral-500 uppercase">Apertura risultati…</p>
           <div className="mt-2 h-px w-full bg-neutral-200">
             <div className="h-px bg-neutral-900" style={{ width: `${Math.min(1, t) * 100}%` }} />
           </div>
