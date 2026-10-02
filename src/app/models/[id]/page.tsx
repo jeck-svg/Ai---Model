@@ -11,7 +11,7 @@ export default async function ModelPage(props: PageProps<"/models/[id]">) {
   return (
     <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 lg:grid-cols-[1fr_1.4fr]">
       <div>
-        <Avatar model={model} className="aspect-[4/5] w-full rounded-2xl" />
+        <Avatar model={model} className="aspect-[4/5] w-full rounded-2xl" sizes="(min-width: 1024px) 40vw, 100vw" label />
       </div>
 
       <div>
