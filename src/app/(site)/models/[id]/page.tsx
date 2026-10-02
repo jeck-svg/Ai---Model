@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Avatar } from "@/components/Avatar";
+import { LicenseOptions } from "@/components/LicenseOptions";
 import { PolaroidGallery } from "@/components/PolaroidGallery";
-import { euro, getModel, modelCode } from "@/lib/models";
+import { getModel, modelCode } from "@/lib/models";
 
 export default async function ModelPage(props: PageProps<"/models/[id]">) {
   const { id } = await props.params;
@@ -62,52 +63,7 @@ export default async function ModelPage(props: PageProps<"/models/[id]">) {
           <h2 className="mt-10 text-xs tracking-wide text-neutral-500 uppercase">
             FIG. 02. — Scegli la licenza AI
           </h2>
-          <div className="mt-4 grid gap-3 md:grid-cols-3">
-            {model.licenses.map((l) => {
-              const featured = l.tier === "standard";
-              return (
-                <div
-                  key={l.tier}
-                  className={`flex flex-col border p-5 ${
-                    featured
-                      ? "border-neutral-900 bg-neutral-900 text-white"
-                      : "border-neutral-200 bg-white text-neutral-900"
-                  }`}
-                >
-                  <div className="flex items-center justify-between text-xs tracking-wide uppercase">
-                    <h3 className="font-medium">{l.name}</h3>
-                    {featured && (
-                      <span className="text-white/60">Consigliata</span>
-                    )}
-                  </div>
-                  <p className="mt-3 font-[family-name:var(--font-display)] text-3xl font-medium tracking-tight">
-                    {euro(l.price)}
-                  </p>
-                  <ul
-                    className={`mt-4 flex-1 space-y-1.5 text-xs ${featured ? "text-white/75" : "text-neutral-600"}`}
-                  >
-                    <li>
-                      {l.durationMonths} mesi · {l.territory}
-                    </li>
-                    <li>{l.generations}</li>
-                    {l.usages.map((u) => (
-                      <li key={u}>+ {u}</li>
-                    ))}
-                  </ul>
-                  <Link
-                    href={`/checkout?model=${model.id}&tier=${l.tier}`}
-                    className={`mt-5 py-2.5 text-center text-xs font-medium tracking-wide uppercase ${
-                      featured
-                        ? "bg-white text-neutral-900 hover:bg-neutral-200"
-                        : "bg-neutral-900 text-white hover:bg-neutral-700"
-                    }`}
-                  >
-                    Acquista diritti AI ↗
-                  </Link>
-                </div>
-              );
-            })}
-          </div>
+          <LicenseOptions modelId={model.id} licenses={model.licenses} />
         </div>
       </div>
       <PolaroidGallery model={model} />

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getModel, MODELS, type Model } from "@/lib/models";
+import { getModel, modelCode, MODELS, type Model } from "@/lib/models";
 import { NavPill } from "./NavPill";
 
 const ArrowIcon = () => (
@@ -18,21 +18,25 @@ const NAV = [
 
 // Side cards fan out around the featured face, tilted towards the centre like the reference.
 const SIDE_CARDS = [
-  { id: "sofia-l", className: "hidden xl:block w-44 h-60 [transform:rotateY(28deg)]" },
-  { id: "aisha-k", className: "hidden md:block w-52 h-72 [transform:rotateY(22deg)]" },
-  { id: "luca-m", className: "hidden md:block w-52 h-72 [transform:rotateY(-22deg)]" },
-  { id: "alex-p", className: "hidden xl:block w-44 h-60 [transform:rotateY(-28deg)]" },
+  { id: "sofia-l", className: "hidden xl:flex w-44 h-60 [transform:rotateY(28deg)]" },
+  { id: "aisha-k", className: "hidden md:flex w-52 h-72 [transform:rotateY(22deg)]" },
+  { id: "luca-m", className: "hidden md:flex w-52 h-72 [transform:rotateY(-22deg)]" },
+  { id: "alex-p", className: "hidden xl:flex w-44 h-60 [transform:rotateY(-28deg)]" },
 ];
 
+// Polaroid-style card: white frame with a wider bottom strip carrying the caption.
 function SideCard({ model, className }: { model: Model; className: string }) {
   return (
     <Link
       href={`/models/${model.id}`}
-      className={`group relative shrink-0 overflow-hidden rounded-2xl border-4 border-white shadow-xl shadow-neutral-900/10 transition duration-500 hover:[transform:rotateY(0deg)_scale(1.04)] ${className}`}
+      className={`group relative shrink-0 flex-col bg-white p-2 pb-0 shadow-[0_10px_30px_rgba(0,0,0,0.14)] ring-1 ring-neutral-200 transition duration-500 hover:[transform:rotateY(0deg)_scale(1.04)] ${className}`}
     >
-      <Image src={`/models/${model.id}.jpg`} alt={`Ritratto di ${model.name}`} fill sizes="220px" className="object-cover" />
-      <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 font-[family-name:var(--font-display)] text-sm font-medium text-white opacity-0 transition group-hover:opacity-100">
-        {model.name}
+      <div className="relative flex-1 overflow-hidden bg-neutral-100">
+        <Image src={`/models/${model.id}.jpg`} alt={`Ritratto di ${model.name}`} fill sizes="220px" className="object-cover" />
+      </div>
+      <span className="flex h-9 items-center justify-between text-[10px] tracking-wide text-neutral-500 uppercase">
+        <span>{model.name}</span>
+        <span>{modelCode(model)}</span>
       </span>
     </Link>
   );
@@ -79,37 +83,42 @@ export function Hero() {
 
         <Link
           href={`/models/${featured.id}`}
-          className="relative h-[460px] w-[300px] shrink-0 overflow-hidden rounded-[2rem] border-4 border-white text-white shadow-2xl shadow-neutral-900/20 sm:h-[520px] sm:w-[340px]"
+          className="relative flex h-[480px] w-[300px] shrink-0 flex-col bg-white p-3 pb-0 shadow-[0_20px_50px_rgba(0,0,0,0.2)] ring-1 ring-neutral-200 sm:h-[540px] sm:w-[340px]"
         >
-          <Image
-            src={`/models/${featured.id}.jpg`}
-            alt={`Ritratto di ${featured.name}`}
-            fill
-            priority
-            sizes="340px"
-            className="object-cover"
-          />
-          {/* Story-style progress bars */}
-          <div className="absolute inset-x-5 top-5 flex gap-1.5">
-            <span className="h-0.5 flex-1 rounded bg-white" />
-            <span className="h-0.5 flex-1 rounded bg-white/50" />
-            <span className="h-0.5 flex-1 rounded bg-white/50" />
-          </div>
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-6 pt-24 pb-6 font-[family-name:var(--font-display)]">
-            <div className="mb-4 flex items-center gap-2 text-white/90">
-              <span className="h-px flex-1 bg-white/80" />
-              <span className="text-xs">✦</span>
-              <span className="h-px flex-1 bg-white/80" />
+          <div className="relative flex-1 overflow-hidden bg-neutral-100 text-white">
+            <Image
+              src={`/models/${featured.id}.jpg`}
+              alt={`Ritratto di ${featured.name}`}
+              fill
+              priority
+              sizes="340px"
+              className="object-cover"
+            />
+            {/* Story-style progress bars */}
+            <div className="absolute inset-x-4 top-4 flex gap-1.5">
+              <span className="h-0.5 flex-1 rounded bg-white" />
+              <span className="h-0.5 flex-1 rounded bg-white/50" />
+              <span className="h-0.5 flex-1 rounded bg-white/50" />
             </div>
-            <p className="text-2xl leading-tight font-medium uppercase sm:text-3xl">
-              Il volto giusto
-              <br />
-              per la tua AI
-            </p>
-            <p className="mt-2 text-sm text-white/80">
-              {featured.name} · {featured.city} · Immagine AI dimostrativa
-            </p>
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-5 pt-24 pb-5 font-[family-name:var(--font-display)]">
+              <div className="mb-4 flex items-center gap-2 text-white/90">
+                <span className="h-px flex-1 bg-white/80" />
+                <span className="text-xs">✦</span>
+                <span className="h-px flex-1 bg-white/80" />
+              </div>
+              <p className="text-2xl leading-tight font-medium uppercase sm:text-3xl">
+                Il volto giusto
+                <br />
+                per la tua AI
+              </p>
+            </div>
           </div>
+          <span className="flex h-12 items-center justify-between text-[11px] tracking-wide text-neutral-500 uppercase">
+            <span>
+              {featured.name} · {featured.city}
+            </span>
+            <span>Immagine AI demo</span>
+          </span>
         </Link>
 
         {side.slice(2).map((c) => (
@@ -124,10 +133,10 @@ export function Hero() {
         </p>
 
         {/* Search bar with a white LED light running around its border */}
-        <div className="relative mt-8 w-full bg-neutral-800 p-[2px] shadow-2xl shadow-neutral-900/25">
-          <span aria-hidden className="led-ring absolute inset-0" />
-          <span aria-hidden className="led-ring absolute -inset-1 opacity-60 blur-md" />
-          <form action="/search" role="search" className="relative flex h-16 items-center bg-neutral-950 p-2 pl-6 sm:h-[72px]">
+        <div className="relative mt-8 w-full rounded-full bg-neutral-800 p-[2px] shadow-2xl shadow-neutral-900/25">
+          <span aria-hidden className="led-ring absolute inset-0 rounded-full" />
+          <span aria-hidden className="led-ring absolute -inset-1 rounded-full opacity-60 blur-md" />
+          <form action="/search" role="search" className="relative flex h-16 items-center rounded-full bg-neutral-950 p-2 pl-7 sm:h-[72px]">
             <span aria-hidden className="mr-3 text-xs tracking-wide text-white/50 uppercase">
               Query_
             </span>
@@ -139,7 +148,7 @@ export function Hero() {
             />
             <button
               type="submit"
-              className="flex h-full items-center gap-2 bg-white px-6 text-xs font-medium tracking-wide text-neutral-900 uppercase transition hover:bg-neutral-300"
+              className="flex h-full items-center gap-2 rounded-full bg-white px-6 text-xs font-medium tracking-wide text-neutral-900 uppercase transition hover:bg-neutral-300"
             >
               Cerca
               <ArrowIcon />
