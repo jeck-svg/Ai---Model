@@ -4,9 +4,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { MODELS, searchModels } from "@/lib/models";
+import { euro, minPrice, modelCode, MODELS, searchModels, type Model } from "@/lib/models";
 
-const DURATION = 4000; // ms of "matching" before showing the results
+const DURATION = 4000; // ms of "matching"
+const READOUT = 2000; // ms spent on the best match before opening its page
 
 const STEPS = [
   "Analisi della query",
@@ -26,7 +27,19 @@ function score(id: string, q: string, matched: boolean) {
 
 const pad = (n: number) => String(Math.round(n)).padStart(2, "0");
 
-// Search form that plays a short matching animation before navigating to /search.
+// Best match for a query, or null when the query is empty or nothing matches.
+function bestMatch(q: string): Model | null {
+  if (!q) return null;
+  const found = searchModels({ q });
+  if (!found.length) return null;
+  return found.reduce((a, b) => (score(b.id, q, true) > score(a.id, q, true) ? b : a));
+}
+
+const targetFor = (q: string, best: Model | null) =>
+  best ? `/models/${best.id}` : q ? `/search?q=${encodeURIComponent(q)}` : "/search";
+
+// Search form that plays a short matching animation, then a short read-out of the best
+// match and opens its page (or the results page when there is no single best match).
 export function MatchingSearchForm({ className, children }: { className?: string; children: ReactNode }) {
   const router = useRouter();
   const [query, setQuery] = useState<string | null>(null);
@@ -34,15 +47,15 @@ export function MatchingSearchForm({ className, children }: { className?: string
   const raf = useRef(0);
 
   const go = (q: string) => {
-    router.push(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
-    // The overlay stays up while the results page loads, then goes away.
+    router.push(targetFor(q, bestMatch(q)));
+    // The overlay stays up while the next page loads, then goes away.
     setTimeout(() => setQuery(null), 400);
   };
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const q = String(new FormData(e.currentTarget).get("q") ?? "").trim();
-    router.prefetch("/search");
+    router.prefetch(targetFor(q, bestMatch(q)));
     setElapsed(0);
     setQuery(q);
   };
@@ -50,10 +63,11 @@ export function MatchingSearchForm({ className, children }: { className?: string
   useEffect(() => {
     if (query === null) return;
     const start = performance.now();
+    const total = bestMatch(query) ? DURATION + READOUT : DURATION;
     const tick = (now: number) => {
       const t = now - start;
-      setElapsed(Math.min(t, DURATION));
-      if (t < DURATION) raf.current = requestAnimationFrame(tick);
+      setElapsed(Math.min(t, total));
+      if (t < total) raf.current = requestAnimationFrame(tick);
       else go(query);
     };
     raf.current = requestAnimationFrame(tick);
@@ -85,7 +99,11 @@ export function MatchingSearchForm({ className, children }: { className?: string
 }
 
 function MatchingOverlay({ query, elapsed, onSkip }: { query: string; elapsed: number; onSkip: () => void }) {
-  const p = elapsed / DURATION; // 0..1
+  const best = bestMatch(query);
+  if (best && elapsed > DURATION) {
+    return <Readout model={best} query={query} t={(elapsed - DURATION) / READOUT} onSkip={onSkip} />;
+  }
+  const p = Math.min(1, elapsed / DURATION); // 0..1
   const matches = new Set(searchModels({ q: query }).map((m) => m.id));
   const scanning = p < 0.65;
   const scanIndex = Math.floor(elapsed / 110) % MODELS.length;
@@ -173,6 +191,73 @@ function MatchingOverlay({ query, elapsed, onSkip }: { query: string; elapsed: n
               ? `${matches.size} ${matches.size === 1 ? "volto perfetto" : "volti perfetti"} per la tua query`
               : "Nessun match perfetto — prova con meno parole")}
         </p>
+      </div>
+    </div>
+  );
+}
+
+// Two-second focus on the selected model: photo in a polaroid frame, data rows appearing
+// one after the other, then the profile opens.
+function Readout({ model, query, t, onSkip }: { model: Model; query: string; t: number; onSkip: () => void }) {
+  const rows: [string, string][] = [
+    ["Codice", modelCode(model)],
+    ["Età", `${model.age} anni`],
+    ["Città", model.city],
+    ["Categorie", model.categories.join(" / ")],
+    ["Tratti", model.tags.join(" / ")],
+    ["Licenza AI da", euro(minPrice(model))],
+  ];
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="corner-marks fixed inset-0 z-[60] flex flex-col bg-white text-neutral-900"
+    >
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 pt-14 text-xs tracking-wide uppercase sm:px-8">
+        <span className="font-medium">Matching_Engine.v1</span>
+        <span className="hidden truncate text-neutral-500 sm:inline">Query: &ldquo;{query}&rdquo;</span>
+        <button type="button" onClick={onSkip} className="link-u">
+          Apri ora ↗
+        </button>
+      </div>
+
+      <div className="mx-auto grid w-full max-w-5xl flex-1 items-center gap-8 px-4 sm:px-8 md:grid-cols-[auto_1fr] md:gap-14">
+        <div className="mx-auto w-[min(48vw,220px)] animate-[pop-in_0.35s_ease-out] bg-white p-3 pb-0 shadow-[0_20px_50px_rgba(0,0,0,0.2)] ring-1 ring-neutral-200 motion-reduce:animate-none md:w-[min(32vw,340px)]">
+          <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100">
+            <Image src={`/models/${model.id}.jpg`} alt={`Ritratto di ${model.name}`} fill sizes="340px" className="object-cover" priority />
+          </div>
+          <p className="flex h-10 items-center justify-between text-[10px] tracking-wide text-neutral-500 uppercase">
+            <span>{model.name}</span>
+            <span>Immagine AI demo</span>
+          </p>
+        </div>
+
+        <div>
+          <p className="text-xs tracking-wide text-neutral-500 uppercase">Match perfetto · {score(model.id, query, true)}%</p>
+          <h2 className="mt-2 font-[family-name:var(--font-display)] text-6xl leading-none font-medium tracking-tighter sm:text-8xl">
+            {model.name}
+          </h2>
+          <dl className="mt-6 border-t border-neutral-200 text-xs uppercase">
+            {rows.map(([k, v], i) => {
+              const shown = t > 0.08 + i * 0.09;
+              return (
+                <div
+                  key={k}
+                  className={`flex justify-between gap-6 border-b border-neutral-200 py-2.5 transition duration-300 ${
+                    shown ? "translate-x-0 opacity-100" : "translate-x-3 opacity-0"
+                  }`}
+                >
+                  <dt className="text-neutral-500">{k}</dt>
+                  <dd className="text-right text-neutral-900">{v}</dd>
+                </div>
+              );
+            })}
+          </dl>
+          <p className="mt-6 text-xs tracking-wide text-neutral-500 uppercase">Apertura profilo…</p>
+          <div className="mt-2 h-px w-full bg-neutral-200">
+            <div className="h-px bg-neutral-900" style={{ width: `${Math.min(1, t) * 100}%` }} />
+          </div>
+        </div>
       </div>
     </div>
   );
