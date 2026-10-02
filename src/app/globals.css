@@ -10,3 +10,35 @@ body {
   color: #171717;
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+/* Rotating white LED light around the hero search bar */
+@property --led-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes led-spin {
+  to {
+    --led-angle: 360deg;
+  }
+}
+
+.led-ring {
+  background: conic-gradient(
+    from var(--led-angle),
+    transparent 0deg,
+    transparent 250deg,
+    rgb(255 255 255 / 0.15) 290deg,
+    rgb(255 255 255 / 0.9) 340deg,
+    #fff 355deg,
+    transparent 360deg
+  );
+  animation: led-spin 3.5s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .led-ring {
+    animation: none;
+  }
+}

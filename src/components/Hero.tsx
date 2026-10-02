@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getModel, type Model } from "@/lib/models";
+import { NavPill } from "./NavPill";
 
 const ArrowIcon = () => (
   <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -9,7 +10,7 @@ const ArrowIcon = () => (
 );
 
 const NAV = [
-  { href: "/", label: "Home", active: true },
+  { href: "/", label: "Home" },
   { href: "/search", label: "Esplora" },
   { href: "#come-funziona", label: "Come funziona" },
   { href: "#licenze", label: "Licenze" },
@@ -27,7 +28,7 @@ function SideCard({ model, className }: { model: Model; className: string }) {
   return (
     <Link
       href={`/models/${model.id}`}
-      className={`group relative shrink-0 overflow-hidden rounded-2xl border-2 border-white/70 shadow-2xl transition duration-500 hover:[transform:rotateY(0deg)_scale(1.04)] ${className}`}
+      className={`group relative shrink-0 overflow-hidden rounded-2xl border-4 border-white shadow-xl shadow-neutral-900/10 transition duration-500 hover:[transform:rotateY(0deg)_scale(1.04)] ${className}`}
     >
       <Image src={`/models/${model.id}.jpg`} alt={`Ritratto di ${model.name}`} fill sizes="220px" className="object-cover" />
       <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 text-sm font-medium text-white opacity-0 transition group-hover:opacity-100">
@@ -42,39 +43,23 @@ export function Hero() {
   const side = SIDE_CARDS.map((c) => ({ ...c, model: getModel(c.id)! }));
 
   return (
-    <section className="relative isolate min-h-[100svh] overflow-hidden text-white">
-      <Image src="/hero-velvet.jpg" alt="" fill priority sizes="100vw" className="-z-20 object-cover" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-black/55 via-transparent to-transparent" />
-
+    <section className="relative isolate overflow-hidden bg-[radial-gradient(ellipse_at_top,#ffffff_0%,#fafaf9_55%,#f1f0ee_100%)] text-neutral-900">
       {/* Giant faded wordmark behind the cards */}
       <p
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-24 -z-10 select-none text-center font-[family-name:var(--font-display)] text-[22vw] leading-none tracking-tight text-white/15"
+        className="pointer-events-none absolute inset-x-0 top-24 -z-10 select-none text-center font-[family-name:var(--font-display)] text-[22vw] leading-none tracking-tight text-neutral-900/[0.05]"
       >
         VELVET
       </p>
 
       <header className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 pt-6 sm:px-8">
         <Link href="/" className="whitespace-nowrap text-2xl font-bold tracking-tight">
-          Velvet<span className="text-rose-300"> Mode</span>
+          Velvet<span className="text-rose-600"> Mode</span>
         </Link>
-        <nav className="hidden items-center gap-1 rounded-full bg-white/90 p-1.5 text-sm font-medium text-neutral-800 shadow-lg backdrop-blur md:flex">
-          {NAV.map((n) => (
-            <Link
-              key={n.label}
-              href={n.href}
-              className={`rounded-full px-5 py-2 uppercase tracking-wide ${
-                n.active ? "bg-rose-600 text-white" : "hover:bg-neutral-100"
-              }`}
-            >
-              {n.label}
-            </Link>
-          ))}
-        </nav>
+        <NavPill items={NAV} activeIndex={0} />
         <Link
           href="/search"
-          className="flex items-center gap-3 whitespace-nowrap rounded-full bg-white/90 py-1.5 pr-1.5 pl-5 text-sm font-medium uppercase tracking-wide text-neutral-800 shadow-lg backdrop-blur"
+          className="flex items-center gap-3 whitespace-nowrap rounded-full border border-neutral-200 bg-white py-1.5 pr-1.5 pl-5 text-sm font-medium uppercase tracking-wide text-neutral-800 shadow-sm"
         >
           Cerca<span className="hidden sm:inline"> un volto</span>
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-rose-600 text-white">
@@ -90,7 +75,7 @@ export function Hero() {
 
         <Link
           href={`/models/${featured.id}`}
-          className="relative h-[460px] w-[300px] shrink-0 overflow-hidden rounded-[2rem] border-2 border-white/80 shadow-2xl sm:h-[520px] sm:w-[340px]"
+          className="relative h-[460px] w-[300px] shrink-0 overflow-hidden rounded-[2rem] border-4 border-white text-white shadow-2xl shadow-neutral-900/20 sm:h-[520px] sm:w-[340px]"
         >
           <Image
             src={`/models/${featured.id}.jpg`}
@@ -128,29 +113,40 @@ export function Hero() {
         ))}
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 pt-10 pb-12 sm:px-8">
-        <p className="max-w-md text-lg leading-relaxed text-white drop-shadow">
+      <div className="mx-auto flex max-w-3xl flex-col items-center px-4 pt-12 pb-16 text-center">
+        <p className="max-w-xl text-lg leading-relaxed text-neutral-600">
           Volti reali, licenziati per l&apos;intelligenza artificiale. Scegli il modello, acquista i diritti AI e
           genera contenuti legali, tracciati e approvati.
         </p>
-        <form
-          action="/search"
-          role="search"
-          className="mt-6 flex max-w-md items-center rounded-full bg-white/95 p-1.5 pl-5 shadow-lg backdrop-blur"
-        >
-          <input
-            name="q"
-            placeholder="Capelli rossi, fitness, Milano…"
-            className="min-w-0 flex-1 bg-transparent text-neutral-900 outline-none placeholder:text-neutral-500"
-          />
-          <button
-            type="submit"
-            className="flex items-center gap-2 rounded-full bg-rose-600 py-2.5 pr-2.5 pl-5 text-sm font-medium uppercase tracking-wide text-white hover:bg-rose-700"
+
+        {/* Search bar with a white LED light running around its border */}
+        <div className="relative mt-8 w-full rounded-full bg-neutral-800 p-[2px] shadow-2xl shadow-neutral-900/25">
+          <span aria-hidden className="led-ring absolute inset-0 rounded-full" />
+          <span aria-hidden className="led-ring absolute -inset-1 rounded-full opacity-60 blur-md" />
+          <form
+            action="/search"
+            role="search"
+            className="relative flex h-16 items-center rounded-full bg-neutral-950 p-2 pl-7 sm:h-[72px]"
           >
-            Cerca
-            <ArrowIcon />
-          </button>
-        </form>
+            <svg viewBox="0 0 24 24" className="mr-3 h-5 w-5 shrink-0 text-white/60" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" strokeLinecap="round" />
+            </svg>
+            <input
+              name="q"
+              aria-label="Cerca un modello"
+              placeholder="Capelli rossi, fitness, Milano…"
+              className="min-w-0 flex-1 bg-transparent text-lg text-white outline-none placeholder:text-white/50"
+            />
+            <button
+              type="submit"
+              className="flex h-full items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold uppercase tracking-wide text-neutral-900 transition hover:bg-rose-600 hover:text-white"
+            >
+              Cerca
+              <ArrowIcon />
+            </button>
+          </form>
+        </div>
       </div>
     </section>
   );
