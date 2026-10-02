@@ -53,13 +53,13 @@ export function Hero() {
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-6 -z-10 select-none text-center font-[family-name:var(--font-display)] text-[25vw] leading-[0.82] font-medium tracking-tighter text-neutral-100"
       >
-        <p>VELVET</p>
-        <p>MODE</p>
+        <p>POLA</p>
+        <p>.AI</p>
       </div>
 
       <header className="mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-4 px-4 pt-14 text-xs tracking-wide uppercase sm:px-8 md:grid-cols-[1fr_auto_1fr]">
         <Link href="/" className="font-medium whitespace-nowrap">
-          Velvet_Mode.S01
+          Pola_AI.S01
         </Link>
         <div className="hidden justify-center md:flex">
           <NavPill items={NAV} activeIndex={0} />

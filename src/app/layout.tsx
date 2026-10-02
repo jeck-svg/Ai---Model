@@ -14,7 +14,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Velvet Mode — Diritti AI dei modelli",
+  title: "Pola.AI — Diritti AI dei modelli",
   description: "Trova un modello e acquista la licenza per usare il suo volto con l'AI.",
 };
 

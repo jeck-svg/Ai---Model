@@ -121,5 +121,5 @@ export function searchModels({ q, category, gender, maxPrice, sort }: SearchFilt
 export const euro = (n: number) =>
   new Intl.NumberFormat("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(n);
 
-// Catalogue code shown in the editorial UI, e.g. "VM_0001".
-export const modelCode = (m: Model) => `VM_${String(MODELS.indexOf(m) + 1).padStart(4, "0")}`;
+// Catalogue code shown in the editorial UI, e.g. "PA_0001".
+export const modelCode = (m: Model) => `PA_${String(MODELS.indexOf(m) + 1).padStart(4, "0")}`;

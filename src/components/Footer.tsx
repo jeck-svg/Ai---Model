@@ -9,7 +9,7 @@ export function Footer() {
         <div className="flex items-end justify-between gap-6">
           <div>
             <p className="font-[family-name:var(--font-display)] text-5xl leading-none font-medium tracking-tight text-neutral-500 sm:text-6xl">
-              Velvet Mode
+              Pola.AI
             </p>
             <p className="mt-3 text-[11px] tracking-wide text-neutral-400 uppercase">
               © {year} · Ogni licenza è approvata dal modello

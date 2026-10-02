@@ -1,4 +1,4 @@
-# Velvet Mode
+# Pola.AI
 
 Marketplace dove le aziende cercano modelli reali e acquistano la licenza per usare il loro volto con l'AI (licenze Base, Standard e Premium).
 
