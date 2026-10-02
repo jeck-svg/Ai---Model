@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getModel, type Model } from "@/lib/models";
+import { getModel, MODELS, type Model } from "@/lib/models";
 import { NavPill } from "./NavPill";
 
 const ArrowIcon = () => (
@@ -31,7 +31,7 @@ function SideCard({ model, className }: { model: Model; className: string }) {
       className={`group relative shrink-0 overflow-hidden rounded-2xl border-4 border-white shadow-xl shadow-neutral-900/10 transition duration-500 hover:[transform:rotateY(0deg)_scale(1.04)] ${className}`}
     >
       <Image src={`/models/${model.id}.jpg`} alt={`Ritratto di ${model.name}`} fill sizes="220px" className="object-cover" />
-      <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 text-sm font-medium text-white opacity-0 transition group-hover:opacity-100">
+      <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-3 font-[family-name:var(--font-display)] text-sm font-medium text-white opacity-0 transition group-hover:opacity-100">
         {model.name}
       </span>
     </Link>
@@ -43,29 +43,33 @@ export function Hero() {
   const side = SIDE_CARDS.map((c) => ({ ...c, model: getModel(c.id)! }));
 
   return (
-    <section className="relative isolate overflow-hidden bg-[radial-gradient(ellipse_at_top,#ffffff_0%,#fafaf9_55%,#f1f0ee_100%)] text-neutral-900">
+    <section className="corner-marks relative isolate overflow-hidden bg-white text-neutral-900">
       {/* Giant faded wordmark behind the cards */}
-      <p
+      <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-24 -z-10 select-none text-center font-[family-name:var(--font-display)] text-[22vw] leading-none tracking-tight text-neutral-900/[0.05]"
+        className="pointer-events-none absolute inset-x-0 top-6 -z-10 select-none text-center font-[family-name:var(--font-display)] text-[25vw] leading-[0.82] font-medium tracking-tighter text-neutral-100"
       >
-        VELVET
-      </p>
+        <p>VELVET</p>
+        <p>MODE</p>
+      </div>
 
-      <header className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 pt-6 sm:px-8">
-        <Link href="/" className="whitespace-nowrap text-2xl font-bold tracking-tight">
-          Velvet<span className="text-rose-600"> Mode</span>
+      <header className="mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-4 px-4 pt-14 text-xs tracking-wide uppercase sm:px-8 md:grid-cols-[1fr_auto_1fr]">
+        <Link href="/" className="font-medium whitespace-nowrap">
+          Velvet_Mode.S01
         </Link>
-        <NavPill items={NAV} activeIndex={0} />
-        <Link
-          href="/candidati"
-          className="flex items-center gap-3 whitespace-nowrap rounded-full border border-neutral-200 bg-white py-1.5 pr-1.5 pl-5 text-sm font-medium uppercase tracking-wide text-neutral-800 shadow-sm"
-        >
-          Candidati
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-rose-600 text-white">
+        <div className="hidden justify-center md:flex">
+          <NavPill items={NAV} activeIndex={0} />
+        </div>
+        <div className="flex items-center justify-end gap-6">
+          <span className="hidden text-neutral-500 lg:inline">ID. {String(MODELS.length).padStart(4, "0")}.X</span>
+          <Link
+            href="/candidati"
+            className="flex items-center gap-2 border border-neutral-900 px-4 py-2 whitespace-nowrap transition hover:bg-neutral-900 hover:text-white"
+          >
+            Candidati
             <ArrowIcon />
-          </span>
-        </Link>
+          </Link>
+        </div>
       </header>
 
       <div className="mx-auto mt-12 flex max-w-7xl items-center justify-center gap-5 px-4 [perspective:1200px] sm:mt-16">
@@ -91,7 +95,7 @@ export function Hero() {
             <span className="h-0.5 flex-1 rounded bg-white/50" />
             <span className="h-0.5 flex-1 rounded bg-white/50" />
           </div>
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-6 pt-24 pb-6">
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-6 pt-24 pb-6 font-[family-name:var(--font-display)]">
             <div className="mb-4 flex items-center gap-2 text-white/90">
               <span className="h-px flex-1 bg-white/80" />
               <span className="text-xs">✦</span>
@@ -113,40 +117,44 @@ export function Hero() {
         ))}
       </div>
 
-      <div className="mx-auto flex max-w-3xl flex-col items-center px-4 pt-10 pb-12 text-center">
-        <p className="max-w-xl text-lg leading-relaxed text-neutral-600">
+      <div className="mx-auto flex max-w-3xl flex-col items-center px-4 pt-10 text-center">
+        <p className="max-w-xl text-sm leading-relaxed text-neutral-600">
           Volti reali, licenziati per l&apos;intelligenza artificiale. Scegli il modello, acquista i diritti AI e
           genera contenuti legali, tracciati e approvati.
         </p>
 
         {/* Search bar with a white LED light running around its border */}
-        <div className="relative mt-8 w-full rounded-full bg-neutral-800 p-[2px] shadow-2xl shadow-neutral-900/25">
-          <span aria-hidden className="led-ring absolute inset-0 rounded-full" />
-          <span aria-hidden className="led-ring absolute -inset-1 rounded-full opacity-60 blur-md" />
-          <form
-            action="/search"
-            role="search"
-            className="relative flex h-16 items-center rounded-full bg-neutral-950 p-2 pl-7 sm:h-[72px]"
-          >
-            <svg viewBox="0 0 24 24" className="mr-3 h-5 w-5 shrink-0 text-white/60" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-              <circle cx="11" cy="11" r="7" />
-              <path d="m20 20-3.5-3.5" strokeLinecap="round" />
-            </svg>
+        <div className="relative mt-8 w-full bg-neutral-800 p-[2px] shadow-2xl shadow-neutral-900/25">
+          <span aria-hidden className="led-ring absolute inset-0" />
+          <span aria-hidden className="led-ring absolute -inset-1 opacity-60 blur-md" />
+          <form action="/search" role="search" className="relative flex h-16 items-center bg-neutral-950 p-2 pl-6 sm:h-[72px]">
+            <span aria-hidden className="mr-3 text-xs tracking-wide text-white/50 uppercase">
+              Query_
+            </span>
             <input
               name="q"
               aria-label="Cerca un modello"
-              placeholder="Capelli rossi, fitness, Milano…"
-              className="min-w-0 flex-1 bg-transparent text-lg text-white outline-none placeholder:text-white/50"
+              placeholder="capelli rossi, fitness, Milano…"
+              className="min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/40"
             />
             <button
               type="submit"
-              className="flex h-full items-center gap-2 rounded-full bg-white px-6 text-sm font-semibold uppercase tracking-wide text-neutral-900 transition hover:bg-rose-600 hover:text-white"
+              className="flex h-full items-center gap-2 bg-white px-6 text-xs font-medium tracking-wide text-neutral-900 uppercase transition hover:bg-neutral-300"
             >
               Cerca
               <ArrowIcon />
             </button>
           </form>
         </div>
+      </div>
+
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 pt-12 pb-8 text-xs tracking-wide uppercase sm:px-8">
+        <Link href="/search" className="link-u flex items-center gap-2">
+          Esplora ({MODELS.length}) <ArrowIcon />
+        </Link>
+        <a href="#come-funziona" className="link-u flex items-center gap-2">
+          Scorri ↓
+        </a>
       </div>
     </section>
   );

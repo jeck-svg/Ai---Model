@@ -30,7 +30,7 @@ export function Avatar({
           className="object-cover"
         />
         {label && (
-          <span className="absolute bottom-2 left-2 rounded-full bg-black/60 px-2 py-0.5 text-[10px] text-white">
+          <span className="absolute bottom-2 left-2 bg-black/60 px-1.5 py-0.5 text-[9px] tracking-wide text-white uppercase">
             Immagine AI dimostrativa
           </span>
         )}

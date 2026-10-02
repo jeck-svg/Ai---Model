@@ -16,77 +16,79 @@ export default async function CandidatiPage(props: PageProps<"/candidati">) {
   if (sent) {
     return (
       <div className="mx-auto max-w-xl px-4 py-20 text-center">
-        <div className="text-5xl">✨</div>
-        <h1 className="mt-4 font-[family-name:var(--font-display)] text-3xl text-neutral-900">Candidatura inviata</h1>
-        <p className="mt-3 text-neutral-600">
+        <p className="text-xs tracking-wide text-neutral-500 uppercase">Status: Candidatura_inviata</p>
+        <h1 className="mt-4 font-[family-name:var(--font-display)] text-5xl font-medium tracking-tight text-neutral-900">
+          Candidatura inviata
+        </h1>
+        <p className="mt-4 text-sm text-neutral-600">
           Grazie! Il nostro team valuterà il tuo profilo e ti contatterà per il servizio fotografico e la firma del
           contratto.
         </p>
-        <Link href="/" className="mt-8 inline-block rounded-full bg-neutral-900 px-6 py-2.5 text-white">
-          Torna alla home
+        <Link href="/" className="mt-8 inline-block bg-neutral-900 px-6 py-3 text-xs tracking-wide text-white uppercase hover:bg-neutral-700">
+          Torna alla home ↗
         </Link>
       </div>
     );
   }
 
-  const input = "mt-1 h-11 w-full rounded-lg border border-neutral-300 bg-white px-3";
+  const input = "mt-2 h-11 w-full border border-neutral-300 bg-white px-3 text-sm normal-case outline-none focus:border-neutral-900";
 
   return (
-    <div className="mx-auto grid max-w-5xl gap-10 px-4 py-12 md:grid-cols-[1fr_1.2fr]">
+    <div className="mx-auto grid max-w-7xl gap-12 px-4 py-10 sm:px-8 md:grid-cols-[1fr_1.2fr]">
       <div>
-        <p className="text-sm font-semibold tracking-[0.2em] text-rose-600 uppercase">Per i modelli</p>
-        <h1 className="mt-3 font-[family-name:var(--font-display)] text-4xl text-neutral-900">
+        <p className="text-xs tracking-wide text-neutral-500 uppercase">Casting.Open_Call</p>
+        <h1 className="mt-2 font-[family-name:var(--font-display)] text-5xl font-medium tracking-tight text-neutral-900 sm:text-6xl">
           Guadagna con il tuo volto, anche nell&apos;era dell&apos;AI
         </h1>
-        <ul className="mt-6 space-y-3 text-neutral-700">
-          <li>✦ Decidi tu i prezzi e gli utilizzi consentiti</li>
-          <li>✦ Approvi ogni licenza prima che venga attivata</li>
-          <li>✦ Mai contenuti politici, diffamatori o per adulti</li>
-          <li>✦ Ricevi un compenso per ogni licenza venduta</li>
+        <ul className="mt-8 border-t border-neutral-200 text-xs tracking-wide text-neutral-700 uppercase">
+          <li className="flex gap-6 border-b border-neutral-200 py-3"><span className="text-neutral-400">01</span>Decidi tu i prezzi e gli utilizzi consentiti</li>
+          <li className="flex gap-6 border-b border-neutral-200 py-3"><span className="text-neutral-400">02</span>Approvi ogni licenza prima che venga attivata</li>
+          <li className="flex gap-6 border-b border-neutral-200 py-3"><span className="text-neutral-400">03</span>Mai contenuti politici, diffamatori o per adulti</li>
+          <li className="flex gap-6 border-b border-neutral-200 py-3"><span className="text-neutral-400">04</span>Ricevi un compenso per ogni licenza venduta</li>
         </ul>
       </div>
 
-      <form action={apply} className="space-y-4 rounded-2xl border border-neutral-200 bg-white p-6">
-        <h2 className="text-xl font-semibold text-neutral-900">Candidati come modello</h2>
+      <form action={apply} className="space-y-5 border border-neutral-900 p-6">
+        <h2 className="text-xs tracking-wide text-neutral-500 uppercase">FIG. 04. — Candidati come modello</h2>
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="block text-sm">
-            <span className="text-neutral-700">Nome e cognome</span>
+          <label className="block text-xs tracking-wide uppercase">
+            <span className="text-neutral-500">Nome e cognome</span>
             <input name="name" required autoComplete="name" className={input} />
           </label>
-          <label className="block text-sm">
-            <span className="text-neutral-700">Email</span>
+          <label className="block text-xs tracking-wide uppercase">
+            <span className="text-neutral-500">Email</span>
             <input name="email" type="email" required autoComplete="email" className={input} />
           </label>
-          <label className="block text-sm">
-            <span className="text-neutral-700">Città</span>
+          <label className="block text-xs tracking-wide uppercase">
+            <span className="text-neutral-500">Città</span>
             <input name="city" required className={input} />
           </label>
-          <label className="block text-sm">
-            <span className="text-neutral-700">Età</span>
+          <label className="block text-xs tracking-wide uppercase">
+            <span className="text-neutral-500">Età</span>
             <input name="age" type="number" min={18} required className={input} />
           </label>
         </div>
-        <label className="block text-sm">
-          <span className="text-neutral-700">Categoria principale</span>
+        <label className="block text-xs tracking-wide uppercase">
+          <span className="text-neutral-500">Categoria principale</span>
           <select name="category" className={input}>
             {CATEGORIES.map((c) => (
               <option key={c}>{c}</option>
             ))}
           </select>
         </label>
-        <label className="block text-sm">
-          <span className="text-neutral-700">Instagram o portfolio (facoltativo)</span>
+        <label className="block text-xs tracking-wide uppercase">
+          <span className="text-neutral-500">Instagram o portfolio (facoltativo)</span>
           <input name="portfolio" placeholder="@nome oppure link" className={input} />
         </label>
-        <label className="flex items-start gap-2 text-sm text-neutral-600">
-          <input type="checkbox" required className="mt-1" />
+        <label className="flex items-start gap-3 text-xs leading-relaxed text-neutral-600">
+          <input type="checkbox" required className="mt-0.5 accent-neutral-900" />
           Ho almeno 18 anni e accetto di essere ricontattato per valutare la candidatura.
         </label>
-        <p className="rounded-lg bg-amber-50 p-3 text-xs text-amber-800">
+        <p className="border border-neutral-300 p-3 text-[11px] tracking-wide text-neutral-500 uppercase">
           Prototipo: la candidatura non viene ancora salvata né inviata.
         </p>
-        <button className="w-full rounded-full bg-rose-600 py-3 font-medium text-white hover:bg-rose-700">
-          Invia candidatura
+        <button className="w-full bg-neutral-900 py-4 text-xs font-medium tracking-wide text-white uppercase hover:bg-neutral-700">
+          Invia candidatura ↗
         </button>
       </form>
     </div>

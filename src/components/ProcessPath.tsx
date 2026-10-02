@@ -34,9 +34,9 @@ function FaceMarquee() {
                   key={`${id}-${i}`}
                   href={`/models/${id}`}
                   tabIndex={i >= row.length ? -1 : undefined}
-                  className="relative h-36 w-28 shrink-0 overflow-hidden rounded-xl bg-neutral-100"
+                  className="relative h-36 w-28 shrink-0 overflow-hidden bg-neutral-100"
                 >
-                  <Image src={`/models/${id}.jpg`} alt={`Ritratto di ${model.name}`} fill sizes="112px" className="object-cover" />
+                  <Image src={`/models/${id}.jpg`} alt={`Ritratto di ${model.name}`} fill sizes="112px" className="object-cover grayscale transition duration-500 hover:grayscale-0" />
                 </Link>
               );
             })}
@@ -79,18 +79,18 @@ function TapTiles({ tiles, icon }: { tiles: Tile[]; icon?: ReactNode }) {
               setActive(i);
             }}
             onClick={() => setActive(i)}
-            className={`rounded-2xl border p-4 text-left transition-[background-color,border-color,box-shadow,scale] duration-300 active:scale-95 motion-reduce:animate-none ${
+            className={`border p-4 text-left transition-[background-color,border-color,box-shadow,scale] duration-300 active:scale-95 motion-reduce:animate-none ${
               on
-                ? "scale-105 animate-[tap_0.55s_ease-out] border-rose-600 bg-rose-50 shadow-lg shadow-rose-600/15"
+                ? "scale-105 animate-[tap_0.55s_ease-out] border-neutral-900 bg-neutral-900 text-white shadow-xl shadow-neutral-900/20"
                 : "scale-100 border-neutral-200 bg-white"
             }`}
           >
-            <p className="flex items-center gap-2 font-semibold text-neutral-900">
-              {icon && <span className={on ? "text-rose-600" : "text-neutral-400"}>{icon}</span>}
+            <p className={`flex items-center gap-2 text-sm font-medium uppercase transition-colors duration-300 ${on ? "text-white" : "text-neutral-900"}`}>
+              {icon && <span className={`transition-colors duration-300 ${on ? "text-white" : "text-neutral-400"}`}>{icon}</span>}
               {tile.title}
             </p>
-            {tile.sub && <p className="mt-0.5 text-xs font-medium text-rose-600">{tile.sub}</p>}
-            <p className="mt-2 text-sm text-neutral-600">{tile.text}</p>
+            {tile.sub && <p className={`mt-1 text-[11px] uppercase transition-colors duration-300 ${on ? "text-white/60" : "text-neutral-500"}`}>{tile.sub}</p>}
+            <p className={`mt-3 text-xs leading-relaxed transition-colors duration-300 ${on ? "text-white/80" : "text-neutral-600"}`}>{tile.text}</p>
           </button>
         );
       })}
@@ -218,8 +218,8 @@ export function ProcessPath() {
   return (
     <section id="come-funziona" className="scroll-mt-8 bg-white px-4 pt-12 pb-12">
       <div className="mx-auto max-w-5xl text-center">
-        <p className="text-sm font-semibold tracking-[0.2em] text-rose-600 uppercase">Come funziona</p>
-        <h2 className="mt-3 font-[family-name:var(--font-display)] text-4xl text-neutral-900 sm:text-5xl">
+        <p className="text-xs tracking-wide text-neutral-500 uppercase">Index.Process_03</p>
+        <h2 className="mt-3 font-[family-name:var(--font-display)] text-4xl font-medium tracking-tight text-neutral-900 sm:text-6xl">
           Dal volto al contenuto, in tre passi
         </h2>
       </div>
@@ -233,7 +233,7 @@ export function ProcessPath() {
               ref={pathRef}
               d={d}
               fill="none"
-              stroke="#e11d48"
+              stroke="#111111"
               strokeWidth="3"
               strokeLinecap="round"
               style={{ strokeDasharray: `${len} ${len}`, strokeDashoffset: len - drawn }}
@@ -243,7 +243,7 @@ export function ProcessPath() {
 
         {/* Mobile: straight line on the left */}
         <div aria-hidden className="absolute top-0 bottom-0 left-5 w-0.5 bg-neutral-200 md:hidden">
-          <div className="w-full bg-rose-600" style={{ height: h ? `${(tip / h) * 100}%` : 0 }} />
+          <div className="w-full bg-neutral-900" style={{ height: h ? `${(tip / h) * 100}%` : 0 }} />
         </div>
 
         {STEPS.map((step, i) => {
@@ -261,9 +261,9 @@ export function ProcessPath() {
             >
               {/* Node on the path */}
               <span
-                className={`absolute top-1/2 left-5 z-10 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 text-sm font-semibold transition-all duration-500 md:left-1/2 ${
+                className={`absolute top-1/2 left-5 z-10 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center border text-xs font-semibold transition-all duration-500 md:left-1/2 ${
                   on
-                    ? "scale-110 border-rose-600 bg-rose-600 text-white shadow-lg shadow-rose-600/30"
+                    ? "border-neutral-900 bg-neutral-900 text-white"
                     : "border-neutral-300 bg-white text-neutral-400"
                 }`}
               >
@@ -273,8 +273,11 @@ export function ProcessPath() {
               <div
                 className={`w-full pl-14 md:w-1/2 md:pl-0 ${right ? "md:order-2 md:ml-auto md:pl-28" : "md:pr-28 md:text-right"} ${fade}`}
               >
-                <h3 className="font-[family-name:var(--font-display)] text-3xl text-neutral-900 sm:text-4xl">{step.title}</h3>
-                <p className="mt-3 text-lg leading-relaxed text-neutral-600">{step.text}</p>
+                <p className="text-xs tracking-wide text-neutral-500 uppercase">FIG. {step.kicker}.</p>
+                <h3 className="mt-2 font-[family-name:var(--font-display)] text-4xl font-medium tracking-tight text-neutral-900 sm:text-5xl">
+                  {step.title}
+                </h3>
+                <p className="mt-4 text-sm leading-relaxed text-neutral-600">{step.text}</p>
               </div>
 
               {step.side && (
@@ -292,7 +295,7 @@ export function ProcessPath() {
         <svg
           aria-hidden
           viewBox="0 0 24 24"
-          className={`-mt-3 ml-2 h-7 w-7 text-rose-600 transition-all duration-500 md:ml-0 ${
+          className={`-mt-3 ml-2 h-7 w-7 text-neutral-900 transition-all duration-500 md:ml-0 ${
             done ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0"
           }`}
           fill="none"
@@ -303,7 +306,7 @@ export function ProcessPath() {
         </svg>
         <Link
           href="/search"
-          className={`mt-4 rounded-full bg-neutral-950 px-8 py-4 text-sm font-semibold tracking-wide text-white uppercase transition-all duration-700 hover:bg-rose-600 ${
+          className={`mt-4 bg-neutral-950 px-8 py-4 text-xs font-medium tracking-wide text-white uppercase transition-all duration-700 hover:bg-neutral-700 ${
             done ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
           }`}
         >

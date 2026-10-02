@@ -1,14 +1,31 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-display: var(--font-playfair);
+  --font-sans: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-display: var(--font-geist-sans), Helvetica, Arial, sans-serif;
 }
 
 body {
-  color: #171717;
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  color: #111;
+  font-family: var(--font-sans);
+}
+
+/* Small grey squares marking the corners of a framed area */
+.corner-marks {
+  background:
+    linear-gradient(#d4d4d4, #d4d4d4) top 1.5rem left 1.5rem / 10px 10px no-repeat,
+    linear-gradient(#d4d4d4, #d4d4d4) top 1.5rem right 1.5rem / 10px 10px no-repeat;
+}
+
+/* Underlined uppercase mono link, as in the editorial reference */
+.link-u {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+.link-u:hover {
+  text-decoration-thickness: 2px;
 }
 
 /* Rotating white LED light around the hero search bar */
