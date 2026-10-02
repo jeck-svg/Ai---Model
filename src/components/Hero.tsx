@@ -43,14 +43,14 @@ export function Hero() {
 
   return (
     <section className="relative isolate min-h-[100svh] overflow-hidden text-white">
-      <Image src="/hero-meadow.jpg" alt="" fill priority sizes="100vw" className="-z-20 object-cover object-bottom" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-sky-600/50 via-transparent to-black/40" />
+      <Image src="/hero-velvet.jpg" alt="" fill priority sizes="100vw" className="-z-20 object-cover" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
       <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-black/55 via-transparent to-transparent" />
 
       {/* Giant faded wordmark behind the cards */}
       <p
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-24 -z-10 select-none text-center font-[family-name:var(--font-display)] text-[22vw] leading-none tracking-tight text-white/20"
+        className="pointer-events-none absolute inset-x-0 top-24 -z-10 select-none text-center font-[family-name:var(--font-display)] text-[22vw] leading-none tracking-tight text-white/15"
       >
         VELVET
       </p>
