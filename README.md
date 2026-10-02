@@ -2,7 +2,7 @@
 
 Marketplace dove le aziende cercano modelli reali e acquistano la licenza per usare il loro volto con l'AI (licenze Base, Standard e Premium).
 
-Online: https://velvet-mode.vercel.app — ogni push su `main` viene pubblicato automaticamente da Vercel.
+Online: https://pola-ai.vercel.app — ogni push su `main` viene pubblicato automaticamente da Vercel.
 
 ## Sviluppo
 
