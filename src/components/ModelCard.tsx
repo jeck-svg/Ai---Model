@@ -8,7 +8,7 @@ export function ModelCard({ model }: { model: Model }) {
       href={`/models/${model.id}`}
       className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white transition hover:-translate-y-0.5 hover:shadow-lg"
     >
-      <Avatar model={model} className="aspect-[4/5] w-full" />
+      <Avatar model={model} className="aspect-[4/5] w-full" label />
       <div className="space-y-2 p-4">
         <div className="flex items-baseline justify-between">
           <h3 className="font-semibold text-neutral-900">{model.name}</h3>

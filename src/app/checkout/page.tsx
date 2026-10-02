@@ -67,7 +67,7 @@ export default async function CheckoutPage(props: PageProps<"/checkout">) {
 
       <aside className="h-fit rounded-2xl border border-neutral-200 bg-white p-6">
         <div className="flex items-center gap-4">
-          <Avatar model={model} className="h-16 w-16 rounded-xl [&_span]:text-lg" />
+          <Avatar model={model} className="h-16 w-16 shrink-0 rounded-xl [&_span]:text-lg" sizes="64px" />
           <div>
             <p className="font-semibold text-neutral-900">{model.name}</p>
             <p className="text-sm text-neutral-500">Licenza {license.name}</p>
