@@ -1,69 +1,67 @@
-import Image from "next/image";
+import Link from "next/link";
+import { SearchBar } from "@/components/SearchBar";
+import { ModelCard } from "@/components/ModelCard";
+import { CATEGORIES, MODELS } from "@/lib/models";
 
 export default function Home() {
+  const featured = [...MODELS].sort((a, b) => b.sales - a.sales).slice(0, 8);
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <>
+      <section className="bg-gradient-to-b from-rose-50 to-neutral-50">
+        <div className="mx-auto max-w-3xl px-4 py-20 text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-neutral-900 sm:text-5xl">
+            Il volto giusto per i tuoi contenuti AI
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-4 text-lg text-neutral-600">
+            Cerca tra modelli reali e acquista la licenza per usare la loro immagine con l&apos;intelligenza
+            artificiale. Legale, tracciata e approvata dal modello.
           </p>
+          <div className="mt-8">
+            <SearchBar large />
+          </div>
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+            {CATEGORIES.map((c) => (
+              <Link
+                key={c}
+                href={`/search?category=${encodeURIComponent(c)}`}
+                className="rounded-full border border-neutral-300 bg-white px-4 py-1.5 text-sm text-neutral-700 hover:border-neutral-900"
+              >
+                {c}
+              </Link>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-12">
+        <div className="mb-6 flex items-baseline justify-between">
+          <h2 className="text-2xl font-semibold text-neutral-900">I più richiesti</h2>
+          <Link href="/search" className="text-sm text-neutral-600 hover:text-neutral-900">
+            Vedi tutti →
+          </Link>
         </div>
-      </main>
-    </div>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+          {featured.map((m) => (
+            <ModelCard key={m.id} model={m} />
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 pb-16">
+        <h2 className="mb-6 text-2xl font-semibold text-neutral-900">Come funziona</h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            ["1. Cerca", "Descrivi il modello che ti serve: look, età, città, categoria."],
+            ["2. Scegli la licenza", "Base, Standard o Premium in base a utilizzi, durata e territorio."],
+            ["3. Genera", "Ricevi il pacchetto di training e il contratto firmato per usare il volto con l'AI."],
+          ].map(([title, text]) => (
+            <div key={title} className="rounded-2xl border border-neutral-200 bg-white p-6">
+              <h3 className="font-semibold text-neutral-900">{title}</h3>
+              <p className="mt-2 text-sm text-neutral-600">{text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
   );
 }
