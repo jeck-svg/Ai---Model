@@ -12,10 +12,14 @@ body {
 }
 
 /* Small grey squares marking the corners of a framed area */
+/* Only background-image/position/size, so the element keeps its own background colour */
 .corner-marks {
-  background:
-    linear-gradient(#d4d4d4, #d4d4d4) top 1.5rem left 1.5rem / 10px 10px no-repeat,
-    linear-gradient(#d4d4d4, #d4d4d4) top 1.5rem right 1.5rem / 10px 10px no-repeat;
+  background-image: linear-gradient(#d4d4d4, #d4d4d4), linear-gradient(#d4d4d4, #d4d4d4);
+  background-position:
+    top 1.5rem left 1.5rem,
+    top 1.5rem right 1.5rem;
+  background-size: 10px 10px;
+  background-repeat: no-repeat;
 }
 
 /* Underlined uppercase mono link, as in the editorial reference */
@@ -101,5 +105,15 @@ body {
   to {
     opacity: 1;
     scale: 1;
+  }
+}
+
+/* Scan line sweeping over the face being analysed in the matching overlay */
+@keyframes scan {
+  from {
+    top: -33%;
+  }
+  to {
+    top: 100%;
   }
 }

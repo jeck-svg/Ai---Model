@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getModel, modelCode, MODELS, type Model } from "@/lib/models";
+import { MatchingSearchForm } from "./MatchingSearchForm";
 import { NavPill } from "./NavPill";
 
 const ArrowIcon = () => (
@@ -53,13 +54,13 @@ export function Hero() {
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-6 -z-10 select-none text-center font-[family-name:var(--font-display)] text-[25vw] leading-[0.82] font-medium tracking-tighter text-neutral-100"
       >
-        <p>VELVET</p>
-        <p>MODE</p>
+        <p>POLA</p>
+        <p>.AI</p>
       </div>
 
       <header className="mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-4 px-4 pt-14 text-xs tracking-wide uppercase sm:px-8 md:grid-cols-[1fr_auto_1fr]">
         <Link href="/" className="font-medium whitespace-nowrap">
-          Velvet_Mode.S01
+          Pola_AI.S01
         </Link>
         <div className="hidden justify-center md:flex">
           <NavPill items={NAV} activeIndex={0} />
@@ -136,7 +137,7 @@ export function Hero() {
         <div className="relative mt-8 w-full rounded-full bg-neutral-800 p-[2px] shadow-2xl shadow-neutral-900/25">
           <span aria-hidden className="led-ring absolute inset-0 rounded-full" />
           <span aria-hidden className="led-ring absolute -inset-1 rounded-full opacity-60 blur-md" />
-          <form action="/search" role="search" className="relative flex h-16 items-center rounded-full bg-neutral-950 p-2 pl-7 sm:h-[72px]">
+          <MatchingSearchForm className="relative flex h-16 items-center rounded-full bg-neutral-950 p-2 pl-7 sm:h-[72px]">
             <span aria-hidden className="mr-3 text-xs tracking-wide text-white/50 uppercase">
               Query_
             </span>
@@ -153,7 +154,7 @@ export function Hero() {
               Cerca
               <ArrowIcon />
             </button>
-          </form>
+          </MatchingSearchForm>
         </div>
       </div>
 

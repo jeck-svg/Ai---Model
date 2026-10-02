@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, JetBrains_Mono } from "next/font/google";
+import { MatchingProvider } from "@/components/MatchingSearchForm";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,7 +15,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Velvet Mode — Diritti AI dei modelli",
+  title: "Pola.AI — Diritti AI dei modelli",
   description: "Trova un modello e acquista la licenza per usare il suo volto con l'AI.",
 };
 
@@ -25,7 +26,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="it"
       className={`${geistSans.variable} ${mono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-white">{children}</body>
+      <body className="flex min-h-full flex-col bg-white">
+        <MatchingProvider>{children}</MatchingProvider>
+      </body>
     </html>
   );
 }
