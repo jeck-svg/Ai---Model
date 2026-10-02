@@ -139,38 +139,18 @@ const STEPS: Step[] = [
   },
 ];
 
-// Winding path through the centre of the steps area, crossing it at each step's row.
-function buildPath(w: number, h: number, ys: number[]) {
-  const cx = (w / 2).toFixed(1);
-  const parts = [`M${cx} 0 V${ys[0].toFixed(1)}`];
-  for (let i = 1; i < ys.length; i++) {
-    const [a, b] = [ys[i - 1], ys[i]];
-    const bend = (w * (i % 2 ? 0.58 : 0.42)).toFixed(1);
-    parts.push(`C ${bend} ${(a + (b - a) * 0.25).toFixed(1)}, ${bend} ${(a + (b - a) * 0.75).toFixed(1)}, ${cx} ${b.toFixed(1)}`);
-  }
-  parts.push(`V${h}`);
-  return parts.join(" ");
-}
-
-const SAMPLE = 4; // px between samples of the y → length table
-
 export function ProcessPath() {
   const areaRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const pathRef = useRef<SVGPathElement>(null);
-  const [layout, setLayout] = useState({ w: 0, h: 0, ys: [] as number[] });
+  const [layout, setLayout] = useState({ h: 0, ys: [] as number[] });
   const [tip, setTip] = useState(0); // y of the line's tip inside the steps area, px
-  const [drawn, setDrawn] = useState(0); // drawn length of the path, px
-  const lengthAtY = useRef<number[]>([]);
-  const total = useRef(0);
 
-  // Measure the steps area and the centre of each row, so the path passes through every node.
+  // Measure the steps area and the centre of each row, where the nodes sit on the line.
   useEffect(() => {
     const el = areaRef.current;
     if (!el) return;
     const measure = () =>
       setLayout({
-        w: el.clientWidth,
         h: el.clientHeight,
         ys: rowRefs.current.map((r) => (r ? r.offsetTop + r.offsetHeight / 2 : 0)),
       });
@@ -180,40 +160,24 @@ export function ProcessPath() {
   }, []);
 
   useEffect(() => {
-    const path = pathRef.current;
-    if (path && layout.h) {
-      total.current = path.getTotalLength();
-      const table: number[] = [];
-      let len = 0;
-      for (let y = 0; y <= layout.h + SAMPLE; y += SAMPLE) {
-        while (len < total.current && path.getPointAtLength(len).y < y) len += 2;
-        table.push(Math.min(len, total.current));
-      }
-      lengthAtY.current = table;
-    }
-
     const update = () => {
       const el = areaRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
       // The tip follows a point a little below the middle of the viewport; at the very
-      // bottom of the page that point can't go further, so the path is completed.
+      // bottom of the page that point can't go further, so the line is completed.
       const atBottom =
         window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4 && rect.top < window.innerHeight;
-      const y = atBottom ? rect.height : Math.min(rect.height, Math.max(0, window.innerHeight * 0.6 - rect.top));
-      setTip(y);
-      setDrawn(lengthAtY.current[Math.round(y / SAMPLE)] ?? 0);
+      setTip(atBottom ? rect.height : Math.min(rect.height, Math.max(0, window.innerHeight * 0.6 - rect.top)));
     };
     update();
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
   }, [layout]);
 
-  const { w, h, ys } = layout;
+  const { h, ys } = layout;
   const reached = STEPS.map((_, i) => ys[i] !== undefined && h > 0 && tip >= ys[i] - 2);
   const done = h > 0 && tip >= h - 2;
-  const d = w && ys.length === STEPS.length ? buildPath(w, h, ys) : "";
-  const len = total.current || 1;
 
   return (
     <section id="come-funziona" className="scroll-mt-8 bg-white px-4 pt-12 pb-12">
@@ -225,24 +189,8 @@ export function ProcessPath() {
       </div>
 
       <div ref={areaRef} className="relative mx-auto mt-6 max-w-5xl">
-        {/* Desktop: winding line through the centre */}
-        {d && (
-          <svg aria-hidden width={w} height={h} className="pointer-events-none absolute inset-0 hidden md:block">
-            <path d={d} fill="none" stroke="#e7e5e4" strokeWidth="2" strokeDasharray="2 10" strokeLinecap="round" />
-            <path
-              ref={pathRef}
-              d={d}
-              fill="none"
-              stroke="#111111"
-              strokeWidth="3"
-              strokeLinecap="round"
-              style={{ strokeDasharray: `${len} ${len}`, strokeDashoffset: len - drawn }}
-            />
-          </svg>
-        )}
-
-        {/* Mobile: straight line on the left */}
-        <div aria-hidden className="absolute top-0 bottom-0 left-5 w-0.5 bg-neutral-200 md:hidden">
+        {/* Straight progress line: on the left on mobile, through the centre on desktop */}
+        <div aria-hidden className="absolute top-0 bottom-0 left-5 w-0.5 -translate-x-1/2 bg-neutral-200 md:left-1/2">
           <div className="w-full bg-neutral-900" style={{ height: h ? `${(tip / h) * 100}%` : 0 }} />
         </div>
 
@@ -271,7 +219,7 @@ export function ProcessPath() {
               </span>
 
               <div
-                className={`w-full pl-14 md:w-1/2 md:pl-0 ${right ? "md:order-2 md:ml-auto md:pl-28" : "md:pr-28 md:text-right"} ${fade}`}
+                className={`w-full pl-14 md:w-1/2 md:pl-0 ${right ? "md:order-2 md:ml-auto md:pl-16" : "md:pr-16 md:text-right"} ${fade}`}
               >
                 <p className="text-xs tracking-wide text-neutral-500 uppercase">FIG. {step.kicker}.</p>
                 <h3 className="mt-2 font-[family-name:var(--font-display)] text-4xl font-medium tracking-tight text-neutral-900 sm:text-5xl">
@@ -281,7 +229,7 @@ export function ProcessPath() {
               </div>
 
               {step.side && (
-                <div className={`mt-8 w-full pl-14 md:mt-0 md:w-1/2 ${right ? "md:pr-28 md:pl-0" : "md:pl-28"} ${fade}`}>
+                <div className={`mt-8 w-full pl-14 md:mt-0 md:w-1/2 ${right ? "md:pr-16 md:pl-0" : "md:pl-16"} ${fade}`}>
                   {step.side}
                 </div>
               )}

@@ -8,7 +8,7 @@ export function ModelCard({ model }: { model: Model }) {
       <div className="overflow-hidden bg-neutral-100">
         <Avatar
           model={model}
-          className="aspect-[4/5] w-full grayscale transition duration-500 group-hover:scale-[1.03] group-hover:grayscale-0"
+          className="aspect-[4/5] w-full transition duration-500 group-hover:scale-[1.03]"
           label
         />
       </div>
