@@ -1,71 +1,72 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Avatar } from "@/components/Avatar";
-import { euro, getModel } from "@/lib/models";
+import { LicenseOptions } from "@/components/LicenseOptions";
+import { PolaroidGallery } from "@/components/PolaroidGallery";
+import { getModel, modelCode } from "@/lib/models";
 
 export default async function ModelPage(props: PageProps<"/models/[id]">) {
   const { id } = await props.params;
   const model = getModel(id);
   if (!model) notFound();
 
+  const facts = [
+    ["Età", `${model.age} anni`],
+    ["Città", model.city],
+    ["Rating", `★ ${model.rating.toFixed(1)} (${model.reviews})`],
+    ["Licenze vendute", String(model.sales)],
+  ];
+
   return (
-    <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 lg:grid-cols-[1fr_1.4fr]">
-      <div>
-        <Avatar model={model} className="aspect-[4/5] w-full rounded-2xl" sizes="(min-width: 1024px) 40vw, 100vw" label />
-      </div>
-
-      <div>
-        <Link href="/search" className="text-sm text-neutral-500 hover:text-neutral-900">
-          ← Torna ai risultati
-        </Link>
-        <h1 className="mt-2 text-3xl font-bold text-neutral-900">{model.name}</h1>
-        <p className="mt-1 text-neutral-600">
-          {model.age} anni · {model.city} · ★ {model.rating.toFixed(1)} ({model.reviews} recensioni) ·{" "}
-          {model.sales} licenze vendute
-        </p>
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {[...model.categories, ...model.tags].map((t) => (
-            <span key={t} className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-700">
-              {t}
-            </span>
-          ))}
+    <>
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-10 sm:px-8 lg:grid-cols-[1fr_1.4fr]">
+        <div>
+          <Avatar
+            model={model}
+            className="aspect-[4/5] w-full"
+            sizes="(min-width: 1024px) 40vw, 100vw"
+            label
+          />
+          <p className="mt-2 flex justify-between text-[11px] tracking-wide text-neutral-500 uppercase">
+            <span>{modelCode(model)}</span>
+            <span>{model.categories.join(" / ")}</span>
+          </p>
         </div>
-        <p className="mt-5 leading-relaxed text-neutral-700">{model.bio}</p>
 
-        <h2 className="mt-8 text-xl font-semibold text-neutral-900">Scegli la licenza AI</h2>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
-          {model.licenses.map((l) => (
-            <div
-              key={l.tier}
-              className={`flex flex-col rounded-2xl border bg-white p-5 ${
-                l.tier === "standard" ? "border-neutral-900 ring-1 ring-neutral-900" : "border-neutral-200"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-neutral-900">{l.name}</h3>
-                {l.tier === "standard" && (
-                  <span className="rounded-full bg-rose-100 px-2 py-0.5 text-xs text-rose-700">Consigliata</span>
-                )}
+        <div>
+          <Link
+            href="/search"
+            className="link-u text-xs tracking-wide uppercase"
+          >
+            ← Torna ai risultati
+          </Link>
+          <h1 className="mt-6 font-[family-name:var(--font-display)] text-5xl font-medium tracking-tight text-neutral-900 sm:text-7xl">
+            {model.name}
+          </h1>
+
+          <dl className="mt-6 grid grid-cols-2 border-t border-neutral-200 text-xs uppercase sm:grid-cols-4">
+            {facts.map(([k, v]) => (
+              <div key={k} className="border-b border-neutral-200 py-3 pr-3">
+                <dt className="text-neutral-500">{k}</dt>
+                <dd className="mt-1 text-neutral-900">{v}</dd>
               </div>
-              <p className="mt-2 text-2xl font-bold text-neutral-900">{euro(l.price)}</p>
-              <ul className="mt-3 flex-1 space-y-1.5 text-sm text-neutral-600">
-                <li>⏱ {l.durationMonths} mesi</li>
-                <li>🌍 {l.territory}</li>
-                <li>🖼 {l.generations}</li>
-                {l.usages.map((u) => (
-                  <li key={u}>✓ {u}</li>
-                ))}
-              </ul>
-              <Link
-                href={`/checkout?model=${model.id}&tier=${l.tier}`}
-                className="mt-5 rounded-full bg-neutral-900 py-2.5 text-center text-sm font-medium text-white hover:bg-neutral-700"
-              >
-                Acquista diritti AI
-              </Link>
-            </div>
-          ))}
+            ))}
+          </dl>
+
+          <p className="mt-6 text-sm leading-relaxed text-neutral-700">
+            {model.bio}
+          </p>
+          <p className="mt-4 text-xs text-neutral-500">
+            {model.tags.join(" / ")}
+          </p>
+
+          <h2 className="mt-10 text-xs tracking-wide text-neutral-500 uppercase">
+            FIG. 02. — Scegli la licenza AI
+          </h2>
+          <LicenseOptions modelId={model.id} licenses={model.licenses} />
         </div>
       </div>
-    </div>
+      <PolaroidGallery model={model} />
+    </>
   );
 }

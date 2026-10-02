@@ -13,13 +13,28 @@ export default async function SearchPage(props: PageProps<"/search">) {
   const sort = one(sp.sort);
   const results = searchModels({ q, category, gender, maxPrice: maxPrice ? Number(maxPrice) : undefined, sort });
 
-  const select = "h-10 rounded-lg border border-neutral-300 bg-white px-3 text-sm";
+  const select = "h-10 border border-neutral-300 bg-white px-3 text-xs uppercase";
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <SearchBar defaultValue={q} />
+    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-8">
+      <div className="flex items-end justify-between gap-6">
+        <div>
+          <p className="text-xs tracking-wide text-neutral-500 uppercase">Inventory.Loc_S01</p>
+          <h1 className="mt-2 font-[family-name:var(--font-display)] text-5xl font-medium tracking-tight text-neutral-900 sm:text-6xl">
+            Esplora
+          </h1>
+        </div>
+        <p className="text-xs tracking-wide text-neutral-500 uppercase">
+          {results.length} {results.length === 1 ? "risultato" : "risultati"}
+          {q && <> · &ldquo;{q}&rdquo;</>}
+        </p>
+      </div>
 
-      <form action="/search" className="mt-4 flex flex-wrap items-center gap-2">
+      <div className="mt-8">
+        <SearchBar defaultValue={q} />
+      </div>
+
+      <form action="/search" className="mt-3 flex flex-wrap items-center gap-2">
         {q && <input type="hidden" name="q" value={q} />}
         <select name="category" defaultValue={category ?? ""} className={select}>
           <option value="">Tutte le categorie</option>
@@ -44,27 +59,17 @@ export default async function SearchPage(props: PageProps<"/search">) {
           <option value="rating">Migliori recensioni</option>
           <option value="prezzo">Prezzo più basso</option>
         </select>
-        <button className="h-10 rounded-lg bg-neutral-900 px-4 text-sm font-medium text-white">Applica</button>
+        <button className="link-u h-10 px-2 text-xs tracking-wide uppercase">Applica filtri</button>
       </form>
 
-      <p className="mt-6 text-sm text-neutral-600">
-        {results.length} {results.length === 1 ? "modello trovato" : "modelli trovati"}
-        {q && (
-          <>
-            {" "}
-            per <strong>&ldquo;{q}&rdquo;</strong>
-          </>
-        )}
-      </p>
-
       {results.length > 0 ? (
-        <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 lg:grid-cols-4">
           {results.map((m) => (
             <ModelCard key={m.id} model={m} />
           ))}
         </div>
       ) : (
-        <div className="mt-10 rounded-2xl border border-dashed border-neutral-300 p-10 text-center text-neutral-600">
+        <div className="mt-10 border border-dashed border-neutral-300 p-10 text-center text-sm text-neutral-600">
           Nessun modello corrisponde. Prova con meno parole o rimuovi qualche filtro.
         </div>
       )}
