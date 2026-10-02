@@ -10,7 +10,6 @@ type Step = {
   kicker: string;
   title: string;
   text: string;
-  extra?: ReactNode;
   // Shown in the opposite column on desktop (below the text on mobile).
   side?: ReactNode;
 };
@@ -48,6 +47,57 @@ function FaceMarquee() {
   );
 }
 
+type Tile = { title: string; sub?: string; text: string };
+
+// Tiles that take turns being "tapped": each one presses down, springs up and stays highlighted
+// for a moment. Hovering or clicking a tile takes over from the automatic cycle.
+function TapTiles({ tiles, icon }: { tiles: Tile[]; icon?: ReactNode }) {
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (paused) return;
+    const t = setInterval(() => setActive((a) => (a + 1) % tiles.length), 1800);
+    return () => clearInterval(t);
+  }, [paused, tiles.length]);
+
+  return (
+    <div className="grid gap-3 sm:grid-cols-3" onMouseLeave={() => setPaused(false)}>
+      {tiles.map((tile, i) => {
+        const on = i === active;
+        return (
+          <button
+            key={tile.title}
+            type="button"
+            aria-pressed={on}
+            onMouseEnter={() => {
+              setPaused(true);
+              setActive(i);
+            }}
+            onFocus={() => {
+              setPaused(true);
+              setActive(i);
+            }}
+            onClick={() => setActive(i)}
+            className={`rounded-2xl border p-4 text-left transition-[background-color,border-color,box-shadow,scale] duration-300 active:scale-95 motion-reduce:animate-none ${
+              on
+                ? "scale-105 animate-[tap_0.55s_ease-out] border-rose-600 bg-rose-50 shadow-lg shadow-rose-600/15"
+                : "scale-100 border-neutral-200 bg-white"
+            }`}
+          >
+            <p className="flex items-center gap-2 font-semibold text-neutral-900">
+              {icon && <span className={on ? "text-rose-600" : "text-neutral-400"}>{icon}</span>}
+              {tile.title}
+            </p>
+            {tile.sub && <p className="mt-0.5 text-xs font-medium text-rose-600">{tile.sub}</p>}
+            <p className="mt-2 text-sm text-neutral-600">{tile.text}</p>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 const STEPS: Step[] = [
   {
     id: "ricerca",
@@ -61,20 +111,14 @@ const STEPS: Step[] = [
     kicker: "02",
     title: "Seleziona",
     text: "Scegli il tipo di diritto sul volto in base a come lo userai: utilizzi consentiti, durata e territorio sono scritti nel contratto.",
-    extra: (
-      <div className="grid gap-2 sm:grid-cols-3">
-        {[
-          ["Base", "6 mesi · Italia", "Social organici e web"],
-          ["Standard", "12 mesi · Europa", "Ads, e-commerce, newsletter"],
-          ["Premium", "24 mesi · Mondo", "ADV, TV, cinema, OOH"],
-        ].map(([name, scope, use]) => (
-          <div key={name} className="rounded-2xl border border-neutral-200 bg-white p-4">
-            <p className="font-semibold text-neutral-900">{name}</p>
-            <p className="mt-0.5 text-xs font-medium text-rose-600">{scope}</p>
-            <p className="mt-2 text-sm text-neutral-600">{use}</p>
-          </div>
-        ))}
-      </div>
+    side: (
+      <TapTiles
+        tiles={[
+          { title: "Base", sub: "6 mesi · Italia", text: "Social organici e web" },
+          { title: "Standard", sub: "12 mesi · Europa", text: "Ads, e-commerce, newsletter" },
+          { title: "Premium", sub: "24 mesi · Mondo", text: "ADV, TV, cinema, OOH" },
+        ]}
+      />
     ),
   },
   {
@@ -82,15 +126,15 @@ const STEPS: Step[] = [
     kicker: "03",
     title: "Produci",
     text: "Usa il volto licenziato per produrre con l'AI: ricevi il pacchetto di training e il contratto firmato dal modello.",
-    extra: (
-      <ul className="grid gap-2 text-sm text-neutral-700 sm:grid-cols-3">
-        {["Immagini e campagne social", "Video e spot", "Cataloghi e-commerce"].map((t) => (
-          <li key={t} className="flex items-center gap-2 rounded-2xl border border-neutral-200 bg-white px-4 py-3">
-            <span className="text-rose-600">✦</span>
-            {t}
-          </li>
-        ))}
-      </ul>
+    side: (
+      <TapTiles
+        icon="✦"
+        tiles={[
+          { title: "Immagini", text: "Campagne social e contenuti web" },
+          { title: "Video", text: "Spot, reel e contenuti animati" },
+          { title: "E-commerce", text: "Cataloghi e schede prodotto" },
+        ]}
+      />
     ),
   },
 ];
@@ -231,7 +275,6 @@ export function ProcessPath() {
               >
                 <h3 className="font-[family-name:var(--font-display)] text-3xl text-neutral-900 sm:text-4xl">{step.title}</h3>
                 <p className="mt-3 text-lg leading-relaxed text-neutral-600">{step.text}</p>
-                {step.extra && <div className="mt-6">{step.extra}</div>}
               </div>
 
               {step.side && (

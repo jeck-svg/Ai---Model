@@ -58,3 +58,19 @@ body {
     transform: translateX(0);
   }
 }
+
+/* "Tap" on the active tile of the process path: press down, spring up, settle */
+@keyframes tap {
+  0% {
+    scale: 1;
+  }
+  30% {
+    scale: 0.93;
+  }
+  65% {
+    scale: 1.09;
+  }
+  100% {
+    scale: 1.05;
+  }
+}
