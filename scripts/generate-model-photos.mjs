@@ -1,5 +1,7 @@
 // Generates one photorealistic portrait per mock model into public/models/<id>.jpg.
 // The people do not exist: these are demo images until real models upload their photos.
+// The committed photos were generated with Higgsfield (Soul 2.0 and GPT Image 2.5);
+// this script is an alternative way to regenerate them with an OpenAI key.
 //
 // Usage: put OPENAI_API_KEY=... in .env.local, then `npm run generate:photos`.
 // Existing files are skipped; pass --force to regenerate them.
