@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Header } from "@/components/Header";
+import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,21 +12,24 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "Velvet Mode — Diritti AI dei modelli",
   description: "Trova un modello e acquista la licenza per usare il suo volto con l'AI.",
 };
 
+// Header and footer live in the (site) layout; the home page draws its own hero header.
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="it" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-neutral-50">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <footer className="border-t border-neutral-200 py-6 text-center text-sm text-neutral-500">
-          © {new Date().getFullYear()} Velvet Mode · Ogni licenza è approvata dal modello
-        </footer>
-      </body>
+    <html
+      lang="it"
+      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
+    >
+      <body className="flex min-h-full flex-col bg-neutral-50">{children}</body>
     </html>
   );
 }
