@@ -42,3 +42,19 @@ body {
     animation: none;
   }
 }
+
+/* Horizontal drift of the model tiles in the process path (list is rendered twice) */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}

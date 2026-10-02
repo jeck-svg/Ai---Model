@@ -11,7 +11,9 @@ export function Header() {
           <Link href="/search" className="hover:text-neutral-900">
             Esplora modelli
           </Link>
-          <span className="hidden sm:inline">Diventa modello</span>
+          <Link href="/candidati" className="hidden hover:text-neutral-900 sm:inline">
+            Diventa modello
+          </Link>
         </nav>
       </div>
     </header>

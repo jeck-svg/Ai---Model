@@ -58,10 +58,10 @@ export function Hero() {
         </Link>
         <NavPill items={NAV} activeIndex={0} />
         <Link
-          href="/search"
+          href="/candidati"
           className="flex items-center gap-3 whitespace-nowrap rounded-full border border-neutral-200 bg-white py-1.5 pr-1.5 pl-5 text-sm font-medium uppercase tracking-wide text-neutral-800 shadow-sm"
         >
-          Cerca<span className="hidden sm:inline"> un volto</span>
+          Candidati
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-rose-600 text-white">
             <ArrowIcon />
           </span>
@@ -113,7 +113,7 @@ export function Hero() {
         ))}
       </div>
 
-      <div className="mx-auto flex max-w-3xl flex-col items-center px-4 pt-12 pb-16 text-center">
+      <div className="mx-auto flex max-w-3xl flex-col items-center px-4 pt-10 pb-12 text-center">
         <p className="max-w-xl text-lg leading-relaxed text-neutral-600">
           Volti reali, licenziati per l&apos;intelligenza artificiale. Scegli il modello, acquista i diritti AI e
           genera contenuti legali, tracciati e approvati.
