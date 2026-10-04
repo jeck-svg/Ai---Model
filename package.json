@@ -10,6 +10,7 @@
     "generate:photos": "node --env-file-if-exists=.env.local scripts/generate-model-photos.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.117.2",
     "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8"

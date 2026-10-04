@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { MODELS } from "@/lib/models";
 
 type Step = {
   id: string;
@@ -15,9 +14,9 @@ type Step = {
 };
 
 // Two rows of model tiles drifting horizontally in opposite directions, fading out at the edges.
-function FaceMarquee() {
-  const ids = MODELS.map((m) => m.id);
-  const rows = [ids, [...ids.slice(6), ...ids.slice(0, 6)]];
+function FaceMarquee({ faces }: { faces: Face[] }) {
+  const half = Math.floor(faces.length / 2);
+  const rows = [faces, [...faces.slice(half), ...faces.slice(0, half)]];
   return (
     <div className="group space-y-3 [mask-image:linear-gradient(to_right,transparent,black_18%,black_82%,transparent)]">
       {rows.map((row, r) => (
@@ -27,8 +26,7 @@ function FaceMarquee() {
               r === 0 ? "animate-[marquee_45s_linear_infinite]" : "animate-[marquee-reverse_45s_linear_infinite]"
             } motion-reduce:animate-none`}
           >
-            {[...row, ...row].map((id, i) => {
-              const model = MODELS.find((m) => m.id === id)!;
+            {[...row, ...row].map(({ id, name }, i) => {
               return (
                 <Link
                   key={`${id}-${i}`}
@@ -36,7 +34,7 @@ function FaceMarquee() {
                   tabIndex={i >= row.length ? -1 : undefined}
                   className="relative h-36 w-28 shrink-0 overflow-hidden bg-neutral-100"
                 >
-                  <Image src={`/models/${id}.jpg`} alt={`Ritratto di ${model.name}`} fill sizes="112px" className="object-cover grayscale transition duration-500 hover:grayscale-0" />
+                  <Image src={`/models/${id}.jpg`} alt={`Ritratto di ${name}`} fill sizes="112px" className="object-cover grayscale transition duration-500 hover:grayscale-0" />
                 </Link>
               );
             })}
@@ -98,13 +96,15 @@ function TapTiles({ tiles, icon }: { tiles: Tile[]; icon?: ReactNode }) {
   );
 }
 
-const STEPS: Step[] = [
+export type Face = { id: string; name: string };
+
+const steps = (faces: Face[]): Step[] => [
   {
     id: "ricerca",
     kicker: "01",
     title: "Ricerca",
     text: "Trova il volto perfetto tra oltre 10.000 volti aggiornati ogni giorno. Filtra per look, età, città e categoria.",
-    side: <FaceMarquee />,
+    side: <FaceMarquee faces={faces} />,
   },
   {
     id: "licenze",
@@ -139,7 +139,8 @@ const STEPS: Step[] = [
   },
 ];
 
-export function ProcessPath() {
+export function ProcessPath({ faces }: { faces: Face[] }) {
+  const STEPS = steps(faces);
   const areaRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [layout, setLayout] = useState({ h: 0, ys: [] as number[] });

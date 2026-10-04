@@ -3,11 +3,12 @@ import { notFound } from "next/navigation";
 import { Avatar } from "@/components/Avatar";
 import { LicenseOptions } from "@/components/LicenseOptions";
 import { PolaroidGallery } from "@/components/PolaroidGallery";
-import { getModel, modelCode } from "@/lib/models";
+import { getModel } from "@/lib/catalog";
+import { modelCode } from "@/lib/models";
 
 export default async function ModelPage(props: PageProps<"/models/[id]">) {
   const { id } = await props.params;
-  const model = getModel(id);
+  const model = await getModel(id);
   if (!model) notFound();
 
   const facts = [

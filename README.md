@@ -19,7 +19,9 @@ Apri http://localhost:3000.
 - `src/app/search/page.tsx` — risultati con filtri
 - `src/app/models/[id]/page.tsx` — profilo del modello e licenze AI
 - `src/app/checkout/page.tsx` — richiesta di acquisto della licenza
-- `src/lib/models.ts` — dati dei modelli (per ora finti) e logica di ricerca
+- `src/lib/models.ts` — tipi e logica di ricerca
+- `src/lib/catalog.ts` — lettura del catalogo da Supabase (aggiornato al massimo ogni minuto)
+- `src/lib/supabase.ts` — client Supabase
 - `supabase/` — schema del database (`migrations/`) e dati iniziali (`seed.sql`)
 
 ## Database (Supabase)
@@ -37,4 +39,4 @@ Candidature e richieste si leggono dalla dashboard Supabase (o lato server con l
 
 ## Stato
 
-Prototipo: il database Supabase è pronto e popolato, ma il sito usa ancora i dati in `src/lib/models.ts`. Prossimi passi: collegare il sito a Supabase (catalogo, candidature, richieste), account e foto, poi Stripe.
+Il sito legge catalogo e licenze da Supabase e salva candidature e richieste di licenza. Le foto sono ancora immagini AI dimostrative in `public/models/`. Prossimi passi: account e foto dei modelli, area admin, poi Stripe.

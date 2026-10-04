@@ -1,28 +1,41 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Avatar } from "@/components/Avatar";
-import { euro, getModel, modelCode } from "@/lib/models";
+import { getModel } from "@/lib/catalog";
+import { euro, modelCode } from "@/lib/models";
+import { supabase } from "@/lib/supabase";
 
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) || "";
 
-// Prototype: the request is not stored yet. Posting to a server action keeps the
-// company and project details out of the URL.
+const serviceFee = (price: number) => Math.round(price * 0.1);
+
+// Saves the license request in Supabase. Price and fee come from the database, never from
+// the form. Posting to a server action keeps the company and project details out of the URL.
 async function sendRequest(formData: FormData) {
   "use server";
-  const params = new URLSearchParams({
-    model: String(formData.get("model")),
-    tier: String(formData.get("tier")),
-    done: "1",
+  const modelId = String(formData.get("model"));
+  const tier = String(formData.get("tier"));
+  const license = (await getModel(modelId))?.licenses.find((l) => l.tier === tier);
+  if (!license) notFound();
+  const { error } = await supabase.from("license_requests").insert({
+    model_id: modelId,
+    tier,
+    company: String(formData.get("company") ?? "").trim(),
+    project: String(formData.get("project") ?? "").trim(),
+    price: license.price,
+    fee: serviceFee(license.price),
   });
+  const params = new URLSearchParams({ model: modelId, tier, ...(error ? { errore: "1" } : { done: "1" }) });
   redirect(`/checkout?${params}`);
 }
 
 export default async function CheckoutPage(props: PageProps<"/checkout">) {
   const sp = await props.searchParams;
-  const model = getModel(one(sp.model));
+  const model = await getModel(one(sp.model));
   const license = model?.licenses.find((l) => l.tier === one(sp.tier));
   if (!model || !license) notFound();
   const done = one(sp.done) === "1";
+  const failed = one(sp.errore) === "1";
 
   if (done) {
     return (
@@ -45,7 +58,7 @@ export default async function CheckoutPage(props: PageProps<"/checkout">) {
     );
   }
 
-  const fee = Math.round(license.price * 0.1);
+  const fee = serviceFee(license.price);
   const label = "block text-xs tracking-wide text-neutral-500 uppercase";
   const input = "mt-2 h-11 w-full border border-neutral-300 bg-white px-3 text-sm outline-none focus:border-neutral-900";
 
@@ -79,8 +92,13 @@ export default async function CheckoutPage(props: PageProps<"/checkout">) {
             Accetto che il volto venga usato solo per gli utilizzi previsti dalla licenza e mai per contenuti
             diffamatori, politici o per adulti.
           </label>
+          {failed && (
+            <p role="alert" className="border border-red-600 p-3 text-[11px] tracking-wide text-red-700 uppercase">
+              Invio non riuscito, riprova tra poco.
+            </p>
+          )}
           <p className="border border-neutral-300 p-3 text-[11px] tracking-wide text-neutral-500 uppercase">
-            Prototipo: il pagamento non è ancora attivo, nessun addebito verrà effettuato.
+            Il pagamento non è ancora attivo: invii una richiesta, nessun addebito verrà effettuato.
           </p>
           <button className="w-full bg-neutral-900 py-4 text-xs font-medium tracking-wide text-white uppercase hover:bg-neutral-700">
             Invia richiesta · {euro(license.price + fee)}
