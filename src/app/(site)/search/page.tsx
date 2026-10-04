@@ -1,5 +1,6 @@
 import { SearchBar } from "@/components/SearchBar";
 import { ModelCard } from "@/components/ModelCard";
+import { getModels } from "@/lib/catalog";
 import { CATEGORIES, searchModels } from "@/lib/models";
 
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) || undefined;
@@ -11,7 +12,7 @@ export default async function SearchPage(props: PageProps<"/search">) {
   const gender = one(sp.gender);
   const maxPrice = one(sp.maxPrice);
   const sort = one(sp.sort);
-  const results = searchModels({ q, category, gender, maxPrice: maxPrice ? Number(maxPrice) : undefined, sort });
+  const results = searchModels(await getModels(), { q, category, gender, maxPrice: maxPrice ? Number(maxPrice) : undefined, sort });
 
   const select = "h-10 border border-neutral-300 bg-white px-3 text-xs uppercase";
 

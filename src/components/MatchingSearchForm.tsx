@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { euro, minPrice, modelCode, MODELS, searchModels, type Model } from "@/lib/models";
+import { euro, minPrice, modelCode, searchModels, type Model } from "@/lib/models";
 
 const DURATION = 4000; // ms of "matching"
 const READOUT = 2000; // ms spent on the best match before opening its page
@@ -27,9 +27,9 @@ function score(id: string, q: string, matched: boolean) {
 const pad = (n: number) => String(Math.round(n)).padStart(2, "0");
 
 // Best match for a query, or null when the query is empty or nothing matches.
-function bestMatch(q: string): Model | null {
+function bestMatch(models: Model[], q: string): Model | null {
   if (!q) return null;
-  const found = searchModels({ q });
+  const found = searchModels(models, { q });
   if (!found.length) return null;
   return found.reduce((a, b) => (score(b.id, q, true) > score(a.id, q, true) ? b : a));
 }
@@ -42,7 +42,7 @@ const MatchingContext = createContext<StartMatching | null>(null);
 // Lives in the root layout so the overlay survives the navigation to /search and can
 // cross-fade into the results page. Plays the matching animation, then a read-out of
 // the best match, then opens the results.
-export function MatchingProvider({ children }: { children: ReactNode }) {
+export function MatchingProvider({ models, children }: { models: Model[]; children: ReactNode }) {
   const router = useRouter();
   const [query, setQuery] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
@@ -81,7 +81,7 @@ export function MatchingProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (query === null) return;
     const begin = performance.now();
-    const total = bestMatch(query) ? DURATION + READOUT : DURATION;
+    const total = bestMatch(models, query) ? DURATION + READOUT : DURATION;
     const tick = (now: number) => {
       const t = now - begin;
       setElapsed(Math.min(t, total));
@@ -108,7 +108,7 @@ export function MatchingProvider({ children }: { children: ReactNode }) {
       {children}
       {query !== null && (
         <div className={`transition-opacity duration-700 ease-out ${leaving ? "pointer-events-none opacity-0" : "opacity-100"}`}>
-          <MatchingOverlay query={query} elapsed={elapsed} onSkip={() => go(query)} />
+          <MatchingOverlay models={models} query={query} elapsed={elapsed} onSkip={() => go(query)} />
         </div>
       )}
     </MatchingContext.Provider>
@@ -131,15 +131,25 @@ export function MatchingSearchForm({ className, children }: { className?: string
   );
 }
 
-function MatchingOverlay({ query, elapsed, onSkip }: { query: string; elapsed: number; onSkip: () => void }) {
-  const best = bestMatch(query);
+function MatchingOverlay({
+  models,
+  query,
+  elapsed,
+  onSkip,
+}: {
+  models: Model[];
+  query: string;
+  elapsed: number;
+  onSkip: () => void;
+}) {
+  const best = bestMatch(models, query);
   if (best && elapsed > DURATION) {
     return <Readout model={best} query={query} t={(elapsed - DURATION) / READOUT} onSkip={onSkip} />;
   }
   const p = Math.min(1, elapsed / DURATION); // 0..1
-  const matches = new Set(searchModels({ q: query }).map((m) => m.id));
+  const matches = new Set(searchModels(models, { q: query }).map((m) => m.id));
   const scanning = p < 0.65;
-  const scanIndex = Math.floor(elapsed / 110) % MODELS.length;
+  const scanIndex = Math.floor(elapsed / 110) % Math.max(1, models.length);
   const reveal = Math.min(1, Math.max(0, (p - 0.6) / 0.3)); // matches emerge in the last part
   const step = STEPS[Math.min(STEPS.length - 1, Math.floor(p * STEPS.length))];
 
@@ -178,7 +188,7 @@ function MatchingOverlay({ query, elapsed, onSkip }: { query: string; elapsed: n
         </div>
 
         <div className="mt-8 grid grid-cols-4 gap-2 sm:grid-cols-6">
-          {MODELS.map((m, i) => {
+          {models.map((m, i) => {
             const isMatch = matches.has(m.id);
             const active = scanning && i === scanIndex;
             const dim = !isMatch && reveal > 0;

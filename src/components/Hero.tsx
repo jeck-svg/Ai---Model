@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getModel, modelCode, MODELS, type Model } from "@/lib/models";
+import { getModels } from "@/lib/catalog";
+import { modelCode, type Model } from "@/lib/models";
 import { MatchingSearchForm } from "./MatchingSearchForm";
 import { NavPill } from "./NavPill";
 
@@ -43,9 +44,15 @@ function SideCard({ model, className }: { model: Model; className: string }) {
   );
 }
 
-export function Hero() {
-  const featured = getModel("giulia-r")!;
-  const side = SIDE_CARDS.map((c) => ({ ...c, model: getModel(c.id)! }));
+export async function Hero() {
+  const models = await getModels();
+  const byId = (id: string) => models.find((m) => m.id === id);
+  // Fall back to the first model if the featured one is removed from the catalogue.
+  const featured = byId("giulia-r") ?? models[0];
+  const side = SIDE_CARDS.flatMap((c) => {
+    const model = byId(c.id);
+    return model ? [{ ...c, model }] : [];
+  });
 
   return (
     <section className="corner-marks relative isolate overflow-hidden bg-white text-neutral-900">
@@ -66,7 +73,7 @@ export function Hero() {
           <NavPill items={NAV} activeIndex={0} />
         </div>
         <div className="flex items-center justify-end gap-6">
-          <span className="hidden text-neutral-500 lg:inline">ID. {String(MODELS.length).padStart(4, "0")}.X</span>
+          <span className="hidden text-neutral-500 lg:inline">ID. {String(models.length).padStart(4, "0")}.X</span>
           <Link
             href="/candidati"
             className="flex items-center gap-2 border border-neutral-900 px-4 py-2 whitespace-nowrap transition hover:bg-neutral-900 hover:text-white"
@@ -160,7 +167,7 @@ export function Hero() {
 
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 pt-12 pb-8 text-xs tracking-wide uppercase sm:px-8">
         <Link href="/search" className="link-u flex items-center gap-2">
-          Esplora ({MODELS.length}) <ArrowIcon />
+          Esplora ({models.length}) <ArrowIcon />
         </Link>
         <a href="#come-funziona" className="link-u flex items-center gap-2">
           Scorri ↓

@@ -1,17 +1,29 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CATEGORIES } from "@/lib/models";
+import { supabase } from "@/lib/supabase";
 
-// Prototype: the application is not stored anywhere yet (no database). The form posts to a
-// server action so personal data never ends up in the URL.
-async function apply() {
+const field = (formData: FormData, name: string) => String(formData.get(name) ?? "").trim();
+
+// Saves the application in Supabase (insert-only for the public, the team reads it from the
+// dashboard). Posting to a server action keeps personal data out of the URL.
+async function apply(formData: FormData) {
   "use server";
-  redirect("/candidati?inviata=1");
+  const { error } = await supabase.from("applications").insert({
+    name: field(formData, "name"),
+    email: field(formData, "email"),
+    city: field(formData, "city"),
+    age: Number(field(formData, "age")),
+    category: field(formData, "category"),
+    portfolio: field(formData, "portfolio") || null,
+  });
+  redirect(error ? "/candidati?errore=1" : "/candidati?inviata=1");
 }
 
 export default async function CandidatiPage(props: PageProps<"/candidati">) {
   const sp = await props.searchParams;
   const sent = sp.inviata === "1";
+  const failed = sp.errore === "1";
 
   if (sent) {
     return (
@@ -84,9 +96,11 @@ export default async function CandidatiPage(props: PageProps<"/candidati">) {
           <input type="checkbox" required className="mt-0.5 accent-neutral-900" />
           Ho almeno 18 anni e accetto di essere ricontattato per valutare la candidatura.
         </label>
-        <p className="border border-neutral-300 p-3 text-[11px] tracking-wide text-neutral-500 uppercase">
-          Prototipo: la candidatura non viene ancora salvata né inviata.
-        </p>
+        {failed && (
+          <p role="alert" className="border border-red-600 p-3 text-[11px] tracking-wide text-red-700 uppercase">
+            Invio non riuscito: controlla i dati (età minima 18 anni) e riprova.
+          </p>
+        )}
         <button className="w-full bg-neutral-900 py-4 text-xs font-medium tracking-wide text-white uppercase hover:bg-neutral-700">
           Invia candidatura ↗
         </button>
